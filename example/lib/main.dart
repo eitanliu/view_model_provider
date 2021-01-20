@@ -19,7 +19,6 @@ class MyApp extends StatelessWidget {
       home: ViewModelExample(),
     );
   }
-
 }
 
 class ViewModelExample extends StatelessWidget {

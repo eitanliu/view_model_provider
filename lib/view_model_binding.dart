@@ -6,7 +6,6 @@ import 'package:collection/collection.dart';
 
 export 'package:provider/provider.dart';
 
-
 typedef ViewModelBindingWidgetBuilder<T> = Widget Function(
     BuildContext context, T value, bool isBinding, Widget child);
 

@@ -1,7 +1,6 @@
 name: view_model_provider
-description: A Flutter MVVM Framework.
-version: 0.0.1
-author: wittyneko
+description: ViewModelProvider is a flutter MVVM framework. and Widget lifecycle listener.
+version: 0.0.2
 homepage: https://github.com/wittyneko/view_model_provider
 
 environment:
@@ -12,6 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^4.1.0
+  collection: ^1.14.13
   tuple: ^1.0.0
 
 dev_dependencies:

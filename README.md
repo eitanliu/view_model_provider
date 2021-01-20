@@ -13,9 +13,9 @@ A Flutter MVVM Framework.
 
 ViewModelProvider 在兼容现有功能基础刷，实现最小改动、不需要每次调用notifyListeners()、支持局部刷新UI和生命周期管理的框架
 
-### 局部刷新控制
+## 局部刷新控制
 
-#### 1. 通过ValueNotifier创建可观察对象
+### 1. 通过ValueNotifier创建可观察对象
 
 ```dart
 class ViewModel extends ChangeNotifier {
@@ -24,7 +24,7 @@ class ViewModel extends ChangeNotifier {
 }
 ```
 
-#### 2. 通过 ValueListenableBuilder 监听数据变化刷新
+### 2. 通过 ValueListenableBuilder 监听数据变化刷新
 
 ```dart
 ValueListenableBuilder(
@@ -36,9 +36,9 @@ ValueListenableBuilder(
 )
 ```
 
-### 列表刷新控制
+## 列表刷新控制
 
-#### 1. 通过 ListNotifier 创建可观察对象
+### 1. 通过 ListNotifier 创建可观察对象
 
 ```dart
 class ViewModel extends ChangeNotifier {
@@ -46,7 +46,7 @@ class ViewModel extends ChangeNotifier {
 }
 ```
 
-#### 2. 通过 ListListenableBuilder 监听数据变化刷新
+### 2. 通过 ListListenableBuilder 监听数据变化刷新
 
 ```dart
 ListListenableBuilder(
@@ -58,9 +58,7 @@ ListListenableBuilder(
 )
 ```
 
-###
-
-### 实现生命周期管理
+## 实现生命周期管理
 
 LifecycleWidget，提供Widget生命周期监听，开放了以下回调接口可进行初始化和解绑操作
 
@@ -72,7 +70,7 @@ LifecycleWidget，提供Widget生命周期监听，开放了以下回调接口�
 - didUpdateWidget，Widget didUpdateWidget 回调
 - didChangeDependencies，Widget didChangeDependencies 回调
 
-### ViewModelProvider
+## ViewModelProvider
 
 创建ViewModel 提供给子Widget使用，开放了以下回调接口可进行初始化和解绑操作
 
@@ -133,7 +131,7 @@ class ProviderWidgetExample extends ViewModelProviderWidget<ViewModel> {
 }
 ```
 
-### ViewModel嵌套处理
+## ViewModel嵌套处理
 
 ViewModel 嵌套 ViewModel 管理子 ViewModel ，提供了两种方式，一种需要手动调用刷新，另一种通过ValueNotifier包装替换ViewModel不需要手动刷新，同ViewModelProvider一样也有相关的抽象类提供继承支持。
 
@@ -161,7 +159,7 @@ class ChildViewModel extends ChangeNotifier {
 }
 ```
 
-#### 1 通过 ViewModelProvider 创建父ViewModel
+### 1 通过 ViewModelProvider 创建父ViewModel
 
 ```dart
 class ChildProviderExapmle extends StatelessWidget {
@@ -195,8 +193,8 @@ class ChildProviderExapmle extends StatelessWidget {
 ```
 
 
-#### 2 创建子ViewModelProvider
-##### 2-1 ChildViewModelProvider
+### 2 创建子ViewModelProvider
+#### 2-1 ChildViewModelProvider
 
 需要手动刷新通常用于列表刷新Item区域，在ViewModelProvider已有回调基础上添加了
 
@@ -233,7 +231,7 @@ class ChildViewModelProviderExample extends StatelessWidget {
 }
 ```
 
-##### 2-2 ValueViewModelProvider
+#### 2-2 ValueViewModelProvider
 
 作用和回调与 ChildViewModelProvider一样，接收数据类型为 `ValueListenable<ChangeNotifier>`
 
@@ -269,16 +267,16 @@ class ValueViewModelProviderExample extends StatelessWidget {
 
 
 
-### 获取ViewModel
+## 获取ViewModel
 
-#### 1 扩展函数
+### 1 扩展函数
 
 通过`context.viewModel<ViewModel>()` 可以快速取出`ViewModelProvider` `ChildViewModelProvider`和 `ValueViewModelProvider`的ViewModel
-#### 2 ViewModelBuilder
+### 2 ViewModelBuilder
 
 用于取出ViewModelProvider提供的ViewModel
 
-### ValueListenableBuilder
+## ValueListenableBuilder
 
  ValueListenableBuilder 只能监听当额数据刷新，同时监听多个数据刷新可采用**ValueTuple2WidgetBuilder**到**ValueListenableTuple7Builder** 和 **ValueListenableListBuilder**
 
@@ -324,7 +322,7 @@ class ValueViewModelProviderExample extends StatelessWidget {
 
 
 
-### ViewModelValueBuilder
+## ViewModelValueBuilder
 
 ViewModelBuilder 和 ValueListenableBuilder 组合，用于获取 ViewModel 和管理Widget刷新区域。
 
