@@ -1,9 +1,9 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:tuple/tuple.dart';
-import 'package:collection/collection.dart';
 
 import 'lifecycle_widget.dart';
 import 'view_model_binding.dart';
@@ -13,35 +13,35 @@ export 'package:provider/provider.dart';
 export 'view_model_binding.dart';
 
 typedef ViewModelWidgetBuilder<VM> = Widget Function(
-    BuildContext context, VM viewModel, Widget child);
+    BuildContext context, VM viewModel, Widget? child);
 
 typedef ChildViewModelWidgetBuilder<PVM, VM> = Widget Function(
-    BuildContext context, PVM parent, VM viewModel, Widget child);
+    BuildContext context, PVM parent, VM viewModel, Widget? child);
 
 class ViewModelProvider<VM extends ChangeNotifier>
     extends SingleChildStatelessWidget {
   final VM Function(BuildContext context) create;
 
-  final Function(BuildContext context, VM viewModel) initViewModel;
+  final Function(BuildContext context, VM viewModel)? initViewModel;
 
-  final Function(BuildContext context, VM viewModel) bindViewModel;
+  final Function(BuildContext context, VM viewModel)? bindViewModel;
 
-  final Function(BuildContext context, VM viewModel) disposeViewModel;
+  final Function(BuildContext context, VM? viewModel)? disposeViewModel;
 
-  final ViewModelWidgetBuilder<VM> builder;
+  final ViewModelWidgetBuilder<VM>? builder;
 
   ViewModelProvider({
-    Key key,
-    @required this.create,
+    Key? key,
+    required this.create,
     this.initViewModel,
     this.bindViewModel,
     this.disposeViewModel,
-    Widget child,
+    Widget? child,
     this.builder,
   }) : super(key: key, child: child);
 
   @override
-  Widget buildWithChild(BuildContext context, Widget child) {
+  Widget buildWithChild(BuildContext context, Widget? child) {
     return ChangeNotifierProvider<VM>(
       create: (_) => create(context),
       child: child,
@@ -52,13 +52,16 @@ class ViewModelProvider<VM extends ChangeNotifier>
           builder: (context, value, isBinding, child) {
             final buildWidget = () {
               if (isBinding) bindViewModel?.call(context, value);
-              return builder?.call(context, value, child) ?? child;
+              return builder?.call(context, value, child) ??
+                  child ??
+                  const SizedBox();
             };
             if (initViewModel != null || disposeViewModel != null) {
-              return LifecycleBuilder(
+              return LifecycleBuilder<VM>(
                 create: (context) => value,
                 initState: (_) => initViewModel?.call(context, value),
                 dispose: (_, value) => disposeViewModel?.call(context, value),
+                child: child,
                 builder: (context, setState, value, child) => buildWidget(),
               );
             }
@@ -74,37 +77,37 @@ class ChildViewModelProvider<PVM extends ChangeNotifier,
     VM extends ChangeNotifier> extends SingleChildStatelessWidget {
   final VM Function(BuildContext context, PVM parent) create;
 
-  final Function(BuildContext context, PVM parent, VM viewModel) initViewModel;
+  final Function(BuildContext context, PVM parent, VM viewModel)? initViewModel;
 
-  final Function(BuildContext context, PVM parent, VM viewModel) bindViewModel;
+  final Function(BuildContext context, PVM parent, VM viewModel)? bindViewModel;
 
-  final Function(BuildContext context, PVM parent, VM viewModel)
+  final Function(BuildContext context, PVM parent, VM viewModel)?
       disposeViewModel;
 
   final Function(
-          BuildContext context, PVM parent, VM viewModel, VM oldViewModel)
+          BuildContext context, PVM parent, VM viewModel, VM? oldViewModel)?
       changeViewModel;
 
-  final ChildViewModelWidgetBuilder<PVM, VM> builder;
+  final ChildViewModelWidgetBuilder<PVM, VM>? builder;
 
   ChildViewModelProvider({
-    Key key,
-    @required this.create,
+    Key? key,
+    required this.create,
     this.initViewModel,
     this.bindViewModel,
     this.disposeViewModel,
     this.changeViewModel,
-    Widget child,
+    Widget? child,
     this.builder,
   }) : super(key: key, child: child);
 
   @override
-  Widget buildWithChild(BuildContext context, Widget child) {
+  Widget buildWithChild(BuildContext context, Widget? child) {
     return ViewModelBinding<PVM, Tuple2<PVM, VM>>(
       selector: (context, pvm) => Tuple2(pvm, create(context, pvm)),
       shouldRebuild: (previous, next) {
         return !const DeepCollectionEquality()
-            .equals(previous?.item2, next.item2);
+            .equals(previous.item2, next.item2);
       },
       child: child,
       builder: (context, value, isBinding, child) {
@@ -117,7 +120,8 @@ class ChildViewModelProvider<PVM extends ChangeNotifier,
                 bindViewModel?.call(context, value.item1, value.item2);
               }
               return builder?.call(context, value.item1, value.item2, child) ??
-                  child;
+                  child ??
+                  const SizedBox();
             };
             if (initViewModel != null ||
                 disposeViewModel != null ||
@@ -135,6 +139,7 @@ class ChildViewModelProvider<PVM extends ChangeNotifier,
                         context, value.item1, value.item2, oldValue);
                   }
                 },
+                child: child,
                 builder: (context, setState, value, child) => buildWidget(),
               );
             }
@@ -150,38 +155,39 @@ class ValueViewModelProvider<PVM extends ChangeNotifier,
     VM extends ChangeNotifier> extends SingleChildStatelessWidget {
   final ValueListenable<VM> Function(BuildContext context, PVM parent) create;
 
-  final Function(BuildContext context, PVM parent, VM viewModel) initViewModel;
+  final Function(BuildContext context, PVM parent, VM viewModel)? initViewModel;
 
-  final Function(BuildContext context, PVM parent, VM viewModel) bindViewModel;
+  final Function(BuildContext context, PVM parent, VM viewModel)? bindViewModel;
 
-  final Function(BuildContext context, PVM parent, VM viewModel)
+  final Function(BuildContext context, PVM parent, VM viewModel)?
       disposeViewModel;
 
   final Function(
-          BuildContext context, PVM parent, VM viewModel, VM oldViewModel)
+          BuildContext context, PVM parent, VM viewModel, VM? oldViewModel)?
       changeViewModel;
 
-  final ChildViewModelWidgetBuilder<PVM, VM> builder;
+  final ChildViewModelWidgetBuilder<PVM, VM>? builder;
 
   ValueViewModelProvider({
-    Key key,
-    @required this.create,
+    Key? key,
+    required this.create,
     this.initViewModel,
     this.bindViewModel,
     this.disposeViewModel,
     this.changeViewModel,
-    Widget child,
+    Widget? child,
     this.builder,
   }) : super(key: key, child: child);
 
   @override
-  Widget buildWithChild(BuildContext context, Widget child) {
+  Widget buildWithChild(BuildContext context, Widget? child) {
     return ViewModelBinding<PVM, Tuple2<PVM, ValueListenable<VM>>>(
       selector: (context, pvm) => Tuple2(pvm, create(context, pvm)),
       child: child,
       builder: (context, value, isBinding, child) {
         return ValueListenableBuilder<VM>(
           valueListenable: value.item2,
+          child: child,
           builder: (context, model, child) {
             return ListenableProvider<VM>.value(
               value: model,
@@ -192,7 +198,8 @@ class ValueViewModelProvider<PVM extends ChangeNotifier,
                     bindViewModel?.call(context, value.item1, model);
                   }
                   return builder?.call(context, value.item1, model, child) ??
-                      child;
+                      child ??
+                      const SizedBox();
                 };
                 if (initViewModel != null ||
                     disposeViewModel != null ||
@@ -210,6 +217,7 @@ class ValueViewModelProvider<PVM extends ChangeNotifier,
                             context, value.item1, model, oldValue);
                       }
                     },
+                    child: child,
                     builder: (context, setState, model, child) => buildWidget(),
                   );
                 }
@@ -226,8 +234,8 @@ class ValueViewModelProvider<PVM extends ChangeNotifier,
 abstract class ViewModelProviderWidget<VM extends ChangeNotifier>
     extends SingleChildStatelessWidget {
   ViewModelProviderWidget({
-    Key key,
-    Widget child,
+    Key? key,
+    Widget? child,
   }) : super(key: key, child: child);
 
   VM create(BuildContext context);
@@ -238,10 +246,10 @@ abstract class ViewModelProviderWidget<VM extends ChangeNotifier>
 
   void disposeViewModel(BuildContext context, VM viewModel) {}
 
-  Widget buildChild(BuildContext context, VM viewModel, Widget child);
+  Widget buildChild(BuildContext context, VM viewModel, Widget? child);
 
   @override
-  Widget buildWithChild(BuildContext context, Widget child) {
+  Widget buildWithChild(BuildContext context, Widget? child) {
     return ChangeNotifierProvider<VM>(
       create: (_) => create(context),
       child: child,
@@ -250,10 +258,11 @@ abstract class ViewModelProviderWidget<VM extends ChangeNotifier>
           selector: (context, vm) => vm,
           child: child,
           builder: (context, value, isBinding, child) {
-            return LifecycleBuilder(
+            return LifecycleBuilder<VM>(
               create: (context) => value,
               initState: (_) => initViewModel(context, value),
               dispose: (_, value) => disposeViewModel(context, value),
+              child: child,
               builder: (context, setState, value, child) {
                 if (isBinding) bindViewModel(context, value);
                 return buildChild(context, value, child);
@@ -269,8 +278,8 @@ abstract class ViewModelProviderWidget<VM extends ChangeNotifier>
 abstract class ChildViewModelProviderWidget<PVM extends ChangeNotifier,
     VM extends ChangeNotifier> extends SingleChildStatelessWidget {
   ChildViewModelProviderWidget({
-    Key key,
-    Widget child,
+    Key? key,
+    Widget? child,
   }) : super(key: key, child: child);
 
   VM create(BuildContext context, PVM parent);
@@ -282,13 +291,13 @@ abstract class ChildViewModelProviderWidget<PVM extends ChangeNotifier,
   void disposeViewModel(BuildContext context, PVM parent, VM viewModel) {}
 
   void changeViewModel(
-      BuildContext context, PVM parent, VM viewModel, VM oldViewModel) {}
+      BuildContext context, PVM parent, VM viewModel, VM? oldViewModel) {}
 
   Widget buildChild(
-      BuildContext context, PVM parent, VM viewModel, Widget child);
+      BuildContext context, PVM parent, VM viewModel, Widget? child);
 
   @override
-  Widget buildWithChild(BuildContext context, Widget child) {
+  Widget buildWithChild(BuildContext context, Widget? child) {
     return ViewModelBinding<PVM, Tuple2<PVM, VM>>(
       selector: (context, pvm) => Tuple2(pvm, create(context, pvm)),
       shouldRebuild: (previous, next) {
@@ -313,9 +322,10 @@ abstract class ChildViewModelProviderWidget<PVM extends ChangeNotifier,
                   changeViewModel(context, value.item1, value.item2, oldValue);
                 }
               },
+              child: child,
               builder: (context, setState, model, child) {
                 if (isBinding) {
-                  bindViewModel?.call(context, value.item1, value.item2);
+                  bindViewModel.call(context, value.item1, value.item2);
                 }
                 return buildChild(context, value.item1, value.item2, child);
               },
@@ -330,32 +340,33 @@ abstract class ChildViewModelProviderWidget<PVM extends ChangeNotifier,
 abstract class ValueViewModelProviderWidget<PVM extends ChangeNotifier,
     VM extends ChangeNotifier> extends SingleChildStatelessWidget {
   ValueViewModelProviderWidget({
-    Key key,
-    Widget child,
+    Key? key,
+    Widget? child,
   }) : super(key: key, child: child);
 
   ValueListenable<VM> create(BuildContext context, PVM parent);
 
   void initViewModel(BuildContext context, PVM parent, VM viewModel) {}
 
-  void bindViewModel(BuildContext context, PVM parent, VM viewModel) {}
+  void bindViewModel(BuildContext context, PVM parent, VM? viewModel) {}
 
   void disposeViewModel(BuildContext context, PVM parent, VM viewModel) {}
 
   void changeViewModel(
-      BuildContext context, PVM parent, VM viewModel, VM oldViewModel) {}
+      BuildContext context, PVM parent, VM viewModel, VM? oldViewModel) {}
 
   Widget buildChild(
-      BuildContext context, PVM parent, VM viewModel, Widget child);
+      BuildContext context, PVM parent, VM? viewModel, Widget? child);
 
   @override
-  Widget buildWithChild(BuildContext context, Widget child) {
+  Widget buildWithChild(BuildContext context, Widget? child) {
     return ViewModelBinding<PVM, Tuple2<PVM, ValueListenable<VM>>>(
       selector: (context, pvm) => Tuple2(pvm, create(context, pvm)),
       child: child,
       builder: (context, value, isBinding, child) {
         return ValueListenableBuilder<VM>(
           valueListenable: value.item2,
+          child: child,
           builder: (context, model, child) {
             return ListenableProvider<VM>.value(
               value: model,
@@ -372,6 +383,7 @@ abstract class ValueViewModelProviderWidget<PVM extends ChangeNotifier,
                       changeViewModel(context, value.item1, model, oldValue);
                     }
                   },
+                  child: child,
                   builder: (context, setState, model, child) {
                     if (isBinding) {
                       bindViewModel(context, value.item1, model);

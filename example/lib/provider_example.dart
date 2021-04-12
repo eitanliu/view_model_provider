@@ -18,7 +18,7 @@ class ViewModel extends ChangeNotifier {
 class ViewModelWidget extends StatelessWidget {
   final ViewModel viewModel;
 
-  const ViewModelWidget(this.viewModel, {Key key}) : super(key: key);
+  const ViewModelWidget(this.viewModel, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +162,7 @@ class ProviderWidgetExample extends ViewModelProviderWidget<ViewModel> {
   }
 
   @override
-  Widget buildChild(BuildContext context, ViewModel viewModel, Widget child) {
+  Widget buildChild(BuildContext context, ViewModel viewModel, Widget? child) {
     debugPrint("ProviderWidgetExample build $viewModel");
     return ViewModelWidget(viewModel);
   }

@@ -1,10 +1,10 @@
 import 'dart:math';
-import 'package:collection/collection.dart';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
 class ListNotifier<E> extends ListListenable<E> {
-  ListNotifier(List<E> list) : super(list);
+  ListNotifier([List<E>? list]) : super(list ?? List<E>.empty(growable: true));
 
   set value(List<E> newValue) {
     if (const DeepCollectionEquality().equals(_value, newValue)) return;
@@ -49,13 +49,13 @@ class ListNotifier<E> extends ListListenable<E> {
   }
 
   @override
-  void sort([int Function(E a, E b) compare]) {
+  void sort([int Function(E a, E b)? compare]) {
     super.sort(compare);
     notifyListeners();
   }
 
   @override
-  void shuffle([Random random]) {
+  void shuffle([Random? random]) {
     super.shuffle(random);
     notifyListeners();
   }
@@ -85,7 +85,7 @@ class ListNotifier<E> extends ListListenable<E> {
   }
 
   @override
-  bool remove(Object value) {
+  bool remove(Object? value) {
     final value2 = super.remove(value);
     notifyListeners();
     return value2;
@@ -130,7 +130,7 @@ class ListNotifier<E> extends ListListenable<E> {
   }
 
   @override
-  void fillRange(int start, int end, [E fillValue]) {
+  void fillRange(int start, int end, [E? fillValue]) {
     super.fillRange(start, end, fillValue);
     notifyListeners();
   }
@@ -190,12 +190,12 @@ class ListListenable<E> extends IterableListenable<List<E>, E>
   Iterable<E> get reversed => _value.reversed;
 
   @override
-  void sort([int compare(E a, E b)]) {
+  void sort([int compare(E a, E b)?]) {
     _value.sort(compare);
   }
 
   @override
-  void shuffle([Random random]) {
+  void shuffle([Random? random]) {
     _value.shuffle(random);
   }
 
@@ -207,11 +207,12 @@ class ListListenable<E> extends IterableListenable<List<E>, E>
       _value.indexWhere(test, start);
 
   @override
-  int lastIndexWhere(bool test(E element), [int start]) =>
+  int lastIndexWhere(bool test(E element), [int? start]) =>
       _value.lastIndexWhere(test, start);
 
   @override
-  int lastIndexOf(E element, [int start]) => _value.lastIndexOf(element, start);
+  int lastIndexOf(E element, [int? start]) =>
+      _value.lastIndexOf(element, start);
 
   @override
   void clear() {
@@ -234,7 +235,7 @@ class ListListenable<E> extends IterableListenable<List<E>, E>
   }
 
   @override
-  bool remove(Object value) {
+  bool remove(Object? value) {
     return _value.remove(value);
   }
 
@@ -264,7 +265,7 @@ class ListListenable<E> extends IterableListenable<List<E>, E>
   }
 
   @override
-  List<E> sublist(int start, [int end]) => _value.sublist(start, end);
+  List<E> sublist(int start, [int? end]) => _value.sublist(start, end);
 
   @override
   Iterable<E> getRange(int start, int end) => _value.getRange(start, end);
@@ -280,7 +281,7 @@ class ListListenable<E> extends IterableListenable<List<E>, E>
   }
 
   @override
-  void fillRange(int start, int end, [E fillValue]) {
+  void fillRange(int start, int end, [E? fillValue]) {
     _value.fillRange(start, end, fillValue);
   }
 
@@ -332,7 +333,7 @@ class IterableListenable<T extends Iterable<E>, E> extends ChangeNotifier
   Iterable<T> expand<T>(Iterable<T> f(E element)) => _value.expand(f);
 
   @override
-  bool contains(Object element) => _value.contains(element);
+  bool contains(Object? element) => _value.contains(element);
 
   @override
   void forEach(void f(E element)) => _value.forEach(f);
@@ -390,15 +391,15 @@ class IterableListenable<T extends Iterable<E>, E> extends ChangeNotifier
   E get single => _value.single;
 
   @override
-  E firstWhere(bool test(E element), {E orElse()}) =>
+  E firstWhere(bool test(E element), {E orElse()?}) =>
       _value.firstWhere(test, orElse: orElse);
 
   @override
-  E lastWhere(bool test(E element), {E orElse()}) =>
+  E lastWhere(bool test(E element), {E orElse()?}) =>
       _value.lastWhere(test, orElse: orElse);
 
   @override
-  E singleWhere(bool test(E element), {E orElse()}) =>
+  E singleWhere(bool test(E element), {E orElse()?}) =>
       _value.singleWhere(test, orElse: orElse);
 
   @override

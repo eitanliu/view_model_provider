@@ -4,12 +4,12 @@ import 'package:view_model_provider/view_model.dart';
 
 class ParentViewModel extends ChangeNotifier {
   var _page = 0;
-  final list = ListNotifier(List<ItemViewModel>());
+  final list = ListNotifier<ItemViewModel>();
 
   void refresh() {
     debugPrint("refresh");
     _page = 0;
-    final newList = List<ItemViewModel>();
+    final newList = List<ItemViewModel>.empty(growable: true);
     for (int i = 0; i < 10; i++) {
       newList.add(ItemViewModel.value("title", i, _page, false));
     }
@@ -109,7 +109,7 @@ class ListProviderExapmle extends StatelessWidget {
 class ItemWidget extends StatelessWidget {
   final int index;
 
-  const ItemWidget({Key key, this.index}) : super(key: key);
+  const ItemWidget({Key? key, required this.index}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -136,14 +136,14 @@ class ItemWidget extends StatelessWidget {
             padding: const EdgeInsets.all(8),
             child: Row(
               children: [
-                ValueListenableBuilder(
+                ValueListenableBuilder<bool>(
                   valueListenable: viewModel.isChecked,
                   builder: (context, value, child) => Checkbox(
                     value: value,
                     onChanged: (value) => viewModel.switchChecked(),
                   ),
                 ),
-                ValueListenableTuple3Builder(
+                ValueListenableTuple3Builder<String, int, int>(
                   valueListenables: Tuple3(
                     viewModel.title,
                     viewModel.index,
