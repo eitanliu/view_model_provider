@@ -145,7 +145,8 @@ class ProviderExample extends StatelessWidget {
 }
 
 /// 继承 [ViewModelProviderWidget] 创建ViewModel
-class ProviderWidgetExample extends ViewModelProviderWidget<ViewModel> {
+class ProviderWidgetExample extends ViewModelProviderWidget<ViewModel>
+    with ViewModelProviderLifecycle<ViewModel> {
   ProviderWidgetExample() : super();
 
   @override
@@ -165,5 +166,40 @@ class ProviderWidgetExample extends ViewModelProviderWidget<ViewModel> {
   Widget buildChild(BuildContext context, ViewModel viewModel, Widget? child) {
     debugPrint("ProviderWidgetExample build $viewModel");
     return ViewModelWidget(viewModel);
+  }
+}
+
+/// 混入 [ViewModelProviderMixin] 创建ViewModel
+/// 混入 [ViewModelProviderLifecycle] 监听ViewModel生命周期
+/// 混入 [ViewModelProviderBuilder] 支持buildChild
+class ProviderMixinExample extends SingleChildStatelessWidget
+    with
+        ViewModelProviderMixin<ViewModel>,
+        ViewModelProviderLifecycle<ViewModel>,
+        ViewModelProviderBuilder<ViewModel> {
+  ProviderMixinExample() : super();
+
+  @override
+  ViewModel create(BuildContext context) => ViewModel();
+
+  @override
+  void initViewModel(BuildContext context, ViewModel viewModel) {
+    debugPrint("ProviderMixinExample initViewModel $viewModel");
+  }
+
+  @override
+  void bindViewModel(BuildContext context, ViewModel viewModel) {
+    debugPrint("ProviderMixinExample bindViewModel $viewModel");
+  }
+
+  @override
+  Widget buildChild(BuildContext context, ViewModel viewModel, Widget? child) {
+    debugPrint("ProviderMixinExample build $viewModel");
+    return ViewModelWidget(viewModel);
+  }
+
+  @override
+  Widget buildWithChild(BuildContext context, Widget? child) {
+    return buildProvider(context, child);
   }
 }

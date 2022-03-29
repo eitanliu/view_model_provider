@@ -44,15 +44,21 @@ class ViewModelExample extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
+                push(context, ProviderMixinExample());
+              },
+              child: Text("BaseMixinExample"),
+            ),
+            ElevatedButton(
+              onPressed: () {
                 push(context, ChildProviderExample());
               },
-              child: Text("ChildExapmle"),
+              child: Text("ChildExample"),
             ),
             ElevatedButton(
               onPressed: () {
                 push(context, ListProviderExapmle());
               },
-              child: Text("ListExapmle"),
+              child: Text("ListExample"),
             ),
           ],
         ),

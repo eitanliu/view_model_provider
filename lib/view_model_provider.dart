@@ -6,10 +6,12 @@ import 'package:tuple/tuple.dart';
 
 import 'lifecycle_widget.dart';
 import 'view_model_binding.dart';
+import 'view_model_provider_mixin.dart';
 
-export 'package:provider/provider.dart';
+export 'package:provider/single_child_widget.dart';
 
 export 'view_model_binding.dart';
+export 'view_model_provider_mixin.dart';
 
 typedef ViewModelWidgetBuilder<VM> = Widget Function(
     BuildContext context, VM viewModel, Widget? child);
@@ -25,7 +27,7 @@ class ViewModelProvider<VM extends ChangeNotifier>
 
   final Function(BuildContext context, VM viewModel)? bindViewModel;
 
-  final Function(BuildContext context, VM? viewModel)? disposeViewModel;
+  final Function(BuildContext context, VM viewModel)? disposeViewModel;
 
   final ViewModelWidgetBuilder<VM>? builder;
 
@@ -231,171 +233,49 @@ class ValueViewModelProvider<PVM extends ChangeNotifier,
 }
 
 abstract class ViewModelProviderWidget<VM extends ChangeNotifier>
-    extends SingleChildStatelessWidget {
+    extends SingleChildStatelessWidget
+    with ViewModelProviderMixin<VM>
+    implements ViewModelProviderBuilder<VM> {
   ViewModelProviderWidget({
     Key? key,
     Widget? child,
   }) : super(key: key, child: child);
 
-  VM create(BuildContext context);
-
-  void initViewModel(BuildContext context, VM viewModel) {}
-
-  void bindViewModel(BuildContext context, VM viewModel) {}
-
-  void disposeViewModel(BuildContext context, VM viewModel) {}
-
-  Widget buildChild(BuildContext context, VM viewModel, Widget? child);
-
   @override
   Widget buildWithChild(BuildContext context, Widget? child) {
-    return ChangeNotifierProvider<VM>(
-      create: (_) => create(context),
-      child: child,
-      builder: (context, child) {
-        return ViewModelBinding<VM, VM>(
-          selector: (context, vm) => vm,
-          child: child,
-          builder: (context, value, isBinding, child) {
-            return LifecycleBuilder<VM>(
-              create: (context) => value,
-              initState: (_) => initViewModel(context, value),
-              dispose: (_, value) => disposeViewModel(context, value),
-              child: child,
-              builder: (context, setState, value, child) {
-                if (isBinding) bindViewModel(context, value);
-                return buildChild(context, value, child);
-              },
-            );
-          },
-        );
-      },
-    );
+    return buildProvider(context, child);
   }
 }
 
 abstract class ChildViewModelProviderWidget<PVM extends ChangeNotifier,
-    VM extends ChangeNotifier> extends SingleChildStatelessWidget {
+        VM extends ChangeNotifier> extends SingleChildStatelessWidget
+    with ChildViewModelProviderMixin<PVM, VM> {
   ChildViewModelProviderWidget({
     Key? key,
     Widget? child,
   }) : super(key: key, child: child);
 
-  VM create(BuildContext context, PVM parent);
-
-  void initViewModel(BuildContext context, PVM parent, VM viewModel) {}
-
-  void bindViewModel(BuildContext context, PVM parent, VM viewModel) {}
-
-  void disposeViewModel(BuildContext context, PVM parent, VM viewModel) {}
-
-  void changeViewModel(
-      BuildContext context, PVM parent, VM viewModel, VM? oldViewModel) {}
-
-  Widget buildChild(
-      BuildContext context, PVM parent, VM viewModel, Widget? child);
-
   @override
   Widget buildWithChild(BuildContext context, Widget? child) {
-    return ViewModelBinding<PVM, Tuple2<PVM, VM>>(
-      selector: (context, pvm) => Tuple2(pvm, create(context, pvm)),
-      shouldRebuild: (previous, next) {
-        return !const DeepCollectionEquality()
-            .equals(previous.item2, next.item2);
-      },
-      child: child,
-      builder: (context, value, isBinding, child) {
-        return ListenableProvider.value(
-          value: value.item2,
-          child: child,
-          builder: (context, child) {
-            return LifecycleBuilder<VM>(
-              create: (context) => context.viewModel<VM>(),
-              initState: (_) =>
-                  initViewModel(context, value.item1, value.item2),
-              dispose: (_, __) =>
-                  disposeViewModel(context, value.item1, value.item2),
-              didChangeDependencies: (context, oldValue) {
-                if (!const DeepCollectionEquality()
-                    .equals(oldValue, value.item2)) {
-                  changeViewModel(context, value.item1, value.item2, oldValue);
-                }
-              },
-              child: child,
-              builder: (context, setState, model, child) {
-                if (isBinding) {
-                  bindViewModel.call(context, value.item1, value.item2);
-                }
-                return buildChild(context, value.item1, value.item2, child);
-              },
-            );
-          },
-        );
-      },
-    );
+    return buildProvider(context, child);
   }
 }
 
 abstract class ValueViewModelProviderWidget<PVM extends ChangeNotifier,
-    VM extends ChangeNotifier> extends SingleChildStatelessWidget {
+        VM extends ChangeNotifier> extends SingleChildStatelessWidget
+    with ValueViewModelProviderMixin<PVM, VM>
+    implements ChildViewModelProviderBuilder<PVM, VM> {
   ValueViewModelProviderWidget({
     Key? key,
     Widget? child,
   }) : super(key: key, child: child);
-
-  ValueListenable<VM> create(BuildContext context, PVM parent);
-
-  void initViewModel(BuildContext context, PVM parent, VM viewModel) {}
-
-  void bindViewModel(BuildContext context, PVM parent, VM? viewModel) {}
-
-  void disposeViewModel(BuildContext context, PVM parent, VM viewModel) {}
-
-  void changeViewModel(
-      BuildContext context, PVM parent, VM viewModel, VM? oldViewModel) {}
 
   Widget buildChild(
       BuildContext context, PVM parent, VM? viewModel, Widget? child);
 
   @override
   Widget buildWithChild(BuildContext context, Widget? child) {
-    return ViewModelBinding<PVM, Tuple2<PVM, ValueListenable<VM>>>(
-      selector: (context, pvm) => Tuple2(pvm, create(context, pvm)),
-      child: child,
-      builder: (context, value, isBinding, child) {
-        return ValueListenableBuilder<VM>(
-          valueListenable: value.item2,
-          child: child,
-          builder: (context, model, child) {
-            return ListenableProvider<VM>.value(
-              value: model,
-              child: child,
-              builder: (context, child) {
-                return LifecycleBuilder<VM>(
-                  create: (context) => context.viewModel<VM>(),
-                  initState: (_) => initViewModel(context, value.item1, model),
-                  dispose: (_, __) =>
-                      disposeViewModel(context, value.item1, model),
-                  didChangeDependencies: (_, oldValue) {
-                    if (!const DeepCollectionEquality()
-                        .equals(oldValue, model)) {
-                      changeViewModel(context, value.item1, model, oldValue);
-                    }
-                  },
-                  child: child,
-                  builder: (context, setState, model, child) {
-                    if (isBinding) {
-                      bindViewModel(context, value.item1, model);
-                    }
-                    return buildChild(context, value.item1, model, child);
-                  },
-                );
-              },
-            );
-          },
-        );
-      },
-    );
+    return buildProvider(context, child);
   }
 }
 

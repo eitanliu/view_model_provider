@@ -76,14 +76,14 @@ class ValueViewModelProviderExample extends StatelessWidget {
         debugPrint("ValueViewModelProvider builder $viewModel");
         return Row(
           children: [
+            ElevatedButton(
+              onPressed: () => viewModel.addValue(),
+              child: Text("addValue"),
+            ),
             ValueListenableBuilder(
               valueListenable: viewModel.value,
               builder: (context, value, child) => Text("${viewModel.value}"),
             ),
-            ElevatedButton(
-              onPressed: () => viewModel.addValue(),
-              child: Text("addValue"),
-            )
           ],
         );
       },
@@ -114,14 +114,14 @@ class ChildViewModelProviderExample extends StatelessWidget {
         debugPrint("ChildViewModelProvider builder $viewModel");
         return Row(
           children: [
+            ElevatedButton(
+              onPressed: () => viewModel.addValue(),
+              child: Text("addValue"),
+            ),
             ValueListenableBuilder(
               valueListenable: viewModel.value,
               builder: (context, value, child) => Text("${viewModel.value}"),
             ),
-            ElevatedButton(
-              onPressed: () => viewModel.addValue(),
-              child: Text("addValue"),
-            )
           ],
         );
       },

@@ -1,3 +1,7 @@
+## [0.0.6]
+
+* support mixin
+
 ## [0.0.5]
 
 * upgrade provider ^6.0.0
