@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/single_child_widget.dart';
 
 import 'value_listenable_list_builder.dart';
 import 'view_model_provider.dart';
