@@ -37,7 +37,7 @@ abstract class ChildViewModelProviderMixin<PVM extends ChangeNotifier,
   Widget buildProvider(
     BuildContext context,
     Widget? child, [
-    ViewModelWidgetBuilder<VM>? builder,
+    ChildViewModelWidgetBuilder<PVM, VM>? builder,
   ]) {
     return ChildViewModelProvider(
       create: create,
@@ -62,7 +62,7 @@ abstract class ValueViewModelProviderMixin<PVM extends ChangeNotifier,
   Widget buildProvider(
     BuildContext context,
     Widget? child, [
-    ViewModelWidgetBuilder<VM>? builder,
+    ChildViewModelWidgetBuilder<PVM, VM>? builder,
   ]) {
     return ValueViewModelProvider(
       create: create,
@@ -87,6 +87,8 @@ abstract class ViewModelProviderBuilder<VM> {
 abstract class ViewModelProviderLifecycle<VM> {
   void initViewModel(BuildContext context, VM viewModel) {}
 
+  void initFrame(BuildContext context, VM viewModel) {}
+
   void bindViewModel(BuildContext context, VM viewModel) {}
 
   void disposeViewModel(BuildContext context, VM viewModel) {}
@@ -107,6 +109,8 @@ abstract class ChildViewModelProviderBuilder<PVM, VM> {
 
 abstract class ChildViewModelProviderLifecycle<PVM, VM> {
   void initViewModel(BuildContext context, PVM parent, VM viewModel) {}
+
+  void initFrame(BuildContext context, PVM parent, VM viewModel) {}
 
   void bindViewModel(BuildContext context, PVM parent, VM viewModel) {}
 

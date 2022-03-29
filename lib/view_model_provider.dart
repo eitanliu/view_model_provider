@@ -13,8 +13,17 @@ export 'package:provider/single_child_widget.dart';
 export 'view_model_binding.dart';
 export 'view_model_provider_mixin.dart';
 
+typedef ViewModelWidgetCallback<VM> = void Function(
+    BuildContext context, VM viewModel);
+
 typedef ViewModelWidgetBuilder<VM> = Widget Function(
     BuildContext context, VM viewModel, Widget? child);
+
+typedef ChildViewModelWidgetCallback<PVM, VM> = void Function(
+    BuildContext context, PVM parent, VM viewModel);
+
+typedef ChildViewModelWidgetChange<PVM, VM> = void Function(
+    BuildContext context, PVM parent, VM viewModel, VM? oldViewModel);
 
 typedef ChildViewModelWidgetBuilder<PVM, VM> = Widget Function(
     BuildContext context, PVM parent, VM viewModel, Widget? child);
@@ -23,11 +32,13 @@ class ViewModelProvider<VM extends ChangeNotifier>
     extends SingleChildStatelessWidget {
   final VM Function(BuildContext context) create;
 
-  final Function(BuildContext context, VM viewModel)? initViewModel;
+  final ViewModelWidgetCallback<VM>? initViewModel;
 
-  final Function(BuildContext context, VM viewModel)? bindViewModel;
+  final ViewModelWidgetCallback<VM>? initFrame;
 
-  final Function(BuildContext context, VM viewModel)? disposeViewModel;
+  final ViewModelWidgetCallback<VM>? bindViewModel;
+
+  final ViewModelWidgetCallback<VM>? disposeViewModel;
 
   final ViewModelWidgetBuilder<VM>? builder;
 
@@ -35,6 +46,7 @@ class ViewModelProvider<VM extends ChangeNotifier>
     Key? key,
     required this.create,
     this.initViewModel,
+    this.initFrame,
     this.bindViewModel,
     this.disposeViewModel,
     Widget? child,
@@ -61,6 +73,7 @@ class ViewModelProvider<VM extends ChangeNotifier>
               return LifecycleBuilder<VM>(
                 create: (context) => value,
                 initState: (_) => initViewModel?.call(context, value),
+                initFrame: (_, __) => initFrame?.call(context, value),
                 dispose: (_, value) => disposeViewModel?.call(context, value),
                 child: child,
                 builder: (context, setState, value, child) => buildWidget(),
@@ -78,16 +91,15 @@ class ChildViewModelProvider<PVM extends ChangeNotifier,
     VM extends ChangeNotifier> extends SingleChildStatelessWidget {
   final VM Function(BuildContext context, PVM parent) create;
 
-  final Function(BuildContext context, PVM parent, VM viewModel)? initViewModel;
+  final ChildViewModelWidgetCallback<PVM, VM>? initViewModel;
 
-  final Function(BuildContext context, PVM parent, VM viewModel)? bindViewModel;
+  final ChildViewModelWidgetCallback<PVM, VM>? initFrame;
 
-  final Function(BuildContext context, PVM parent, VM viewModel)?
-      disposeViewModel;
+  final ChildViewModelWidgetCallback<PVM, VM>? bindViewModel;
 
-  final Function(
-          BuildContext context, PVM parent, VM viewModel, VM? oldViewModel)?
-      changeViewModel;
+  final ChildViewModelWidgetCallback<PVM, VM>? disposeViewModel;
+
+  final ChildViewModelWidgetChange<PVM, VM>? changeViewModel;
 
   final ChildViewModelWidgetBuilder<PVM, VM>? builder;
 
@@ -95,6 +107,7 @@ class ChildViewModelProvider<PVM extends ChangeNotifier,
     Key? key,
     required this.create,
     this.initViewModel,
+    this.initFrame,
     this.bindViewModel,
     this.disposeViewModel,
     this.changeViewModel,
@@ -131,6 +144,8 @@ class ChildViewModelProvider<PVM extends ChangeNotifier,
                 create: (context) => context.viewModel<VM>(),
                 initState: (_) =>
                     initViewModel?.call(context, value.item1, value.item2),
+                initFrame: (_, __) =>
+                    initFrame?.call(context, value.item1, value.item2),
                 dispose: (_, __) =>
                     disposeViewModel?.call(context, value.item1, value.item2),
                 didChangeDependencies: (context, oldValue) {
@@ -156,16 +171,15 @@ class ValueViewModelProvider<PVM extends ChangeNotifier,
     VM extends ChangeNotifier> extends SingleChildStatelessWidget {
   final ValueListenable<VM> Function(BuildContext context, PVM parent) create;
 
-  final Function(BuildContext context, PVM parent, VM viewModel)? initViewModel;
+  final ChildViewModelWidgetCallback<PVM, VM>? initViewModel;
 
-  final Function(BuildContext context, PVM parent, VM viewModel)? bindViewModel;
+  final ChildViewModelWidgetCallback<PVM, VM>? initFrame;
 
-  final Function(BuildContext context, PVM parent, VM viewModel)?
-      disposeViewModel;
+  final ChildViewModelWidgetCallback<PVM, VM>? bindViewModel;
 
-  final Function(
-          BuildContext context, PVM parent, VM viewModel, VM? oldViewModel)?
-      changeViewModel;
+  final ChildViewModelWidgetCallback<PVM, VM>? disposeViewModel;
+
+  final ChildViewModelWidgetChange<PVM, VM>? changeViewModel;
 
   final ChildViewModelWidgetBuilder<PVM, VM>? builder;
 
@@ -173,6 +187,7 @@ class ValueViewModelProvider<PVM extends ChangeNotifier,
     Key? key,
     required this.create,
     this.initViewModel,
+    this.initFrame,
     this.bindViewModel,
     this.disposeViewModel,
     this.changeViewModel,
@@ -209,6 +224,8 @@ class ValueViewModelProvider<PVM extends ChangeNotifier,
                     create: (context) => context.viewModel<VM>(),
                     initState: (_) =>
                         initViewModel?.call(context, value.item1, model),
+                    initFrame: (_, __) =>
+                        initFrame?.call(context, value.item1, model),
                     dispose: (_, __) =>
                         disposeViewModel?.call(context, value.item1, model),
                     didChangeDependencies: (_, oldValue) {
