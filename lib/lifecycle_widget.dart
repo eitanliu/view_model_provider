@@ -1,10 +1,13 @@
 import 'package:flutter/widgets.dart';
 import 'package:provider/single_child_widget.dart';
 
+/// 监听生命周期
 class LifecycleBuilder<T> extends SingleChildStatefulWidget {
   final T Function(BuildContext context)? create;
 
   final Function(BuildContext context)? initState;
+
+  final Function(BuildContext context, T value)? initBuild;
 
   final Function(BuildContext context, T value)? initFrame;
 
@@ -27,6 +30,7 @@ class LifecycleBuilder<T> extends SingleChildStatefulWidget {
     Key? key,
     this.create,
     this.initState,
+    this.initBuild,
     this.initFrame,
     this.deactivate,
     this.dispose,
@@ -43,6 +47,7 @@ class LifecycleBuilder<T> extends SingleChildStatefulWidget {
 
 class _LifecycleWidgetState<T> extends SingleChildState<LifecycleBuilder<T>> {
   T? value;
+  bool _firstBuilder = true;
 
   @override
   void initState() {
@@ -83,6 +88,10 @@ class _LifecycleWidgetState<T> extends SingleChildState<LifecycleBuilder<T>> {
   Widget buildWithChild(BuildContext context, Widget? child) {
     value = widget.create?.call(context);
     widget.state?.call(context, setState);
+    if (_firstBuilder) {
+      widget.initBuild?.call(context, value as T);
+      _firstBuilder = false;
+    }
     return widget.builder?.call(context, setState, value as T, child) ??
         child ??
         const SizedBox();

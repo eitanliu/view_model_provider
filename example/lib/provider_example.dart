@@ -203,3 +203,43 @@ class ProviderMixinExample extends SingleChildStatelessWidget
     return buildProvider(context, child);
   }
 }
+
+/// 混入调用 [ViewModelProviderLifecycleMixin.buildLifecycle] 支持监听ViewModel生命周期
+/// 混入 [ViewModelProviderLifecycle] 监听ViewModel生命周期
+class ProviderLifecycleMixinExample extends SingleChildStatelessWidget
+    with
+        ViewModelProviderLifecycleMixin<ViewModel>,
+        ViewModelProviderLifecycle<ViewModel> {
+  ProviderLifecycleMixinExample() : super();
+
+  @override
+  void initViewModel(BuildContext context, ViewModel viewModel) {
+    debugPrint(
+        "ViewModelProviderLifecycleMixinExample initViewModel $viewModel");
+  }
+
+  @override
+  void bindViewModel(BuildContext context, ViewModel viewModel) {
+    debugPrint(
+        "ViewModelProviderLifecycleMixinExample bindViewModel $viewModel");
+  }
+
+  Widget buildChild(BuildContext context, ViewModel viewModel, Widget? child) {
+    return buildLifecycle(
+      context,
+      child,
+      builder: (context, viewModel, child) {
+        debugPrint("ViewModelProviderLifecycleMixinExample build $viewModel");
+        return ViewModelWidget(viewModel);
+      },
+    );
+  }
+
+  @override
+  Widget buildWithChild(BuildContext context, Widget? child) {
+    return ViewModelProvider<ViewModel>(
+      create: (context) => ViewModel(),
+      builder: buildChild,
+    );
+  }
+}

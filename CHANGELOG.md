@@ -1,3 +1,7 @@
+## [0.0.8]
+
+* support lifecycle mixin
+
 ## [0.0.7]
 
 * support initFrame
