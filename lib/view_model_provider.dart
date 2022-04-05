@@ -69,7 +69,9 @@ class ViewModelProvider<VM extends ChangeNotifier>
                   child ??
                   const SizedBox();
             };
-            if (initViewModel != null || disposeViewModel != null) {
+            if (initViewModel != null ||
+                initFrame != null ||
+                disposeViewModel != null) {
               return LifecycleBuilder<VM>(
                 create: (context) => value,
                 initState: (_) => initViewModel?.call(context, value),
@@ -138,6 +140,7 @@ class ChildViewModelProvider<PVM extends ChangeNotifier,
                   const SizedBox();
             };
             if (initViewModel != null ||
+                initFrame != null ||
                 disposeViewModel != null ||
                 changeViewModel != null) {
               return LifecycleBuilder<VM>(

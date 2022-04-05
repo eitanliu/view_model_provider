@@ -1,3 +1,7 @@
+## [0.0.9]
+
+* fix bugs initFrame on mixin no call
+
 ## [0.0.8]
 
 * support lifecycle mixin

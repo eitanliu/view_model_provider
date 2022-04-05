@@ -24,6 +24,7 @@ abstract class ViewModelProviderMixin<VM extends ChangeNotifier>
     return ViewModelProvider<VM>(
       create: create,
       initViewModel: _lifecycle?.initViewModel,
+      initFrame: _lifecycle?.initFrame,
       bindViewModel: _lifecycle?.bindViewModel,
       disposeViewModel: _lifecycle?.disposeViewModel,
       child: child,

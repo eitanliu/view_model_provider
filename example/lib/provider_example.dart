@@ -186,6 +186,11 @@ class ProviderMixinExample extends SingleChildStatelessWidget
   void initViewModel(BuildContext context, ViewModel viewModel) {
     debugPrint("ProviderMixinExample initViewModel $viewModel");
   }
+  @override
+  void initFrame(BuildContext context, ViewModel viewModel) {
+    debugPrint("ProviderMixinExample initFrame $viewModel");
+    super.initFrame(context, viewModel);
+  }
 
   @override
   void bindViewModel(BuildContext context, ViewModel viewModel) {
