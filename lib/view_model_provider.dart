@@ -22,13 +22,13 @@ typedef ViewModelWidgetChange<VM> = void Function(
 typedef ViewModelWidgetBuilder<VM> = Widget Function(
     BuildContext context, VM viewModel, Widget? child);
 
-typedef ChildViewModelWidgetCallback<PVM, VM> = void Function(
+typedef PairViewModelWidgetCallback<PVM, VM> = void Function(
     BuildContext context, PVM parent, VM viewModel);
 
-typedef ChildViewModelWidgetChange<PVM, VM> = void Function(
+typedef PairViewModelWidgetChange<PVM, VM> = void Function(
     BuildContext context, PVM parent, VM viewModel, VM? oldViewModel);
 
-typedef ChildViewModelWidgetBuilder<PVM, VM> = Widget Function(
+typedef PairViewModelWidgetBuilder<PVM, VM> = Widget Function(
     BuildContext context, PVM parent, VM viewModel, Widget? child);
 
 class ViewModelProvider<VM extends ChangeNotifier>
@@ -92,21 +92,174 @@ class ViewModelProvider<VM extends ChangeNotifier>
   }
 }
 
+class ChildViewModelProvider<VM extends ChangeNotifier>
+    extends SingleChildStatelessWidget {
+  final VM Function(BuildContext context) create;
+
+  final ViewModelWidgetCallback<VM>? initViewModel;
+
+  final ViewModelWidgetCallback<VM>? initFrame;
+
+  final ViewModelWidgetCallback<VM>? bindViewModel;
+
+  final ViewModelWidgetCallback<VM>? disposeViewModel;
+
+  final ViewModelWidgetChange<VM>? changeViewModel;
+
+  final ViewModelWidgetBuilder<VM>? builder;
+
+  ChildViewModelProvider({
+    Key? key,
+    required this.create,
+    this.initViewModel,
+    this.initFrame,
+    this.bindViewModel,
+    this.disposeViewModel,
+    this.changeViewModel,
+    Widget? child,
+    this.builder,
+  }) : super(key: key, child: child);
+
+  @override
+  Widget buildWithChild(BuildContext context, Widget? child) {
+    return ViewModelBinding0<VM>(
+      selector: (context) => create(context),
+      shouldRebuild: (previous, next) {
+        return !const DeepCollectionEquality().equals(previous, next);
+      },
+      child: child,
+      builder: (context, value, isBinding, child) {
+        return ListenableProvider.value(
+          value: value,
+          child: child,
+          builder: (context, child) {
+            final buildWidget = () {
+              if (isBinding) {
+                bindViewModel?.call(context, value);
+              }
+              return builder?.call(context, value, child) ??
+                  child ??
+                  const SizedBox();
+            };
+            if (initViewModel != null ||
+                initFrame != null ||
+                disposeViewModel != null ||
+                changeViewModel != null) {
+              return LifecycleBuilder<VM>(
+                create: (context) => context.viewModel<VM>(),
+                initState: (_) => initViewModel?.call(context, value),
+                initFrame: (_, __) => initFrame?.call(context, value),
+                dispose: (_, __) => disposeViewModel?.call(context, value),
+                didChangeDependencies: (context, oldValue) {
+                  if (!const DeepCollectionEquality().equals(oldValue, value)) {
+                    changeViewModel?.call(context, value, oldValue);
+                  }
+                },
+                child: child,
+                builder: (context, setState, value, child) => buildWidget(),
+              );
+            }
+            return buildWidget();
+          },
+        );
+      },
+    );
+  }
+}
+
+class ValueViewModelProvider<VM extends ChangeNotifier>
+    extends SingleChildStatelessWidget {
+  final ValueListenable<VM> Function(BuildContext context) create;
+
+  final ViewModelWidgetCallback<VM>? initViewModel;
+
+  final ViewModelWidgetCallback<VM>? initFrame;
+
+  final ViewModelWidgetCallback<VM>? bindViewModel;
+
+  final ViewModelWidgetCallback<VM>? disposeViewModel;
+
+  final ViewModelWidgetChange<VM>? changeViewModel;
+
+  final ViewModelWidgetBuilder<VM>? builder;
+
+  ValueViewModelProvider({
+    Key? key,
+    required this.create,
+    this.initViewModel,
+    this.initFrame,
+    this.bindViewModel,
+    this.disposeViewModel,
+    this.changeViewModel,
+    Widget? child,
+    this.builder,
+  }) : super(key: key, child: child);
+
+  @override
+  Widget buildWithChild(BuildContext context, Widget? child) {
+    return ViewModelBinding0<ValueListenable<VM>>(
+      selector: (context) => create(context),
+      child: child,
+      builder: (context, value, isBinding, child) {
+        return ValueListenableBuilder<VM>(
+          valueListenable: value,
+          child: child,
+          builder: (context, model, child) {
+            return ListenableProvider<VM>.value(
+              value: model,
+              child: child,
+              builder: (context, child) {
+                final buildWidget = () {
+                  if (isBinding) {
+                    bindViewModel?.call(context, model);
+                  }
+                  return builder?.call(context, model, child) ??
+                      child ??
+                      const SizedBox();
+                };
+                if (initViewModel != null ||
+                    disposeViewModel != null ||
+                    changeViewModel != null) {
+                  return LifecycleBuilder<VM>(
+                    create: (context) => context.viewModel<VM>(),
+                    initState: (_) => initViewModel?.call(context, model),
+                    initFrame: (_, __) => initFrame?.call(context, model),
+                    dispose: (_, __) => disposeViewModel?.call(context, model),
+                    didChangeDependencies: (_, oldValue) {
+                      if (!const DeepCollectionEquality()
+                          .equals(oldValue, model)) {
+                        changeViewModel?.call(context, model, oldValue);
+                      }
+                    },
+                    child: child,
+                    builder: (context, setState, model, child) => buildWidget(),
+                  );
+                }
+                return buildWidget();
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
 class PairChildViewModelProvider<PVM extends ChangeNotifier,
     VM extends ChangeNotifier> extends SingleChildStatelessWidget {
   final VM Function(BuildContext context, PVM parent) create;
 
-  final ChildViewModelWidgetCallback<PVM, VM>? initViewModel;
+  final PairViewModelWidgetCallback<PVM, VM>? initViewModel;
 
-  final ChildViewModelWidgetCallback<PVM, VM>? initFrame;
+  final PairViewModelWidgetCallback<PVM, VM>? initFrame;
 
-  final ChildViewModelWidgetCallback<PVM, VM>? bindViewModel;
+  final PairViewModelWidgetCallback<PVM, VM>? bindViewModel;
 
-  final ChildViewModelWidgetCallback<PVM, VM>? disposeViewModel;
+  final PairViewModelWidgetCallback<PVM, VM>? disposeViewModel;
 
-  final ChildViewModelWidgetChange<PVM, VM>? changeViewModel;
+  final PairViewModelWidgetChange<PVM, VM>? changeViewModel;
 
-  final ChildViewModelWidgetBuilder<PVM, VM>? builder;
+  final PairViewModelWidgetBuilder<PVM, VM>? builder;
 
   PairChildViewModelProvider({
     Key? key,
@@ -177,17 +330,17 @@ class PairValueViewModelProvider<PVM extends ChangeNotifier,
     VM extends ChangeNotifier> extends SingleChildStatelessWidget {
   final ValueListenable<VM> Function(BuildContext context, PVM parent) create;
 
-  final ChildViewModelWidgetCallback<PVM, VM>? initViewModel;
+  final PairViewModelWidgetCallback<PVM, VM>? initViewModel;
 
-  final ChildViewModelWidgetCallback<PVM, VM>? initFrame;
+  final PairViewModelWidgetCallback<PVM, VM>? initFrame;
 
-  final ChildViewModelWidgetCallback<PVM, VM>? bindViewModel;
+  final PairViewModelWidgetCallback<PVM, VM>? bindViewModel;
 
-  final ChildViewModelWidgetCallback<PVM, VM>? disposeViewModel;
+  final PairViewModelWidgetCallback<PVM, VM>? disposeViewModel;
 
-  final ChildViewModelWidgetChange<PVM, VM>? changeViewModel;
+  final PairViewModelWidgetChange<PVM, VM>? changeViewModel;
 
-  final ChildViewModelWidgetBuilder<PVM, VM>? builder;
+  final PairViewModelWidgetBuilder<PVM, VM>? builder;
 
   PairValueViewModelProvider({
     Key? key,
@@ -287,7 +440,7 @@ abstract class ChildViewModelProviderWidget<PVM extends ChangeNotifier,
 abstract class ValueViewModelProviderWidget<PVM extends ChangeNotifier,
         VM extends ChangeNotifier> extends SingleChildStatelessWidget
     with PairValueViewModelProviderMixin<PVM, VM>
-    implements ChildViewModelProviderBuilder<PVM, VM> {
+    implements PairViewModelProviderBuilder<PVM, VM> {
   ValueViewModelProviderWidget({
     Key? key,
     Widget? child,

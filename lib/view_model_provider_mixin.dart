@@ -33,23 +33,22 @@ abstract class ViewModelProviderMixin<VM extends ChangeNotifier>
   }
 }
 
-abstract class PairChildViewModelProviderMixin<PVM extends ChangeNotifier,
-        VM extends ChangeNotifier>
-    implements ChildViewModelProviderCreate<PVM, VM> {
+abstract class ChildViewModelProviderMixin<VM extends ChangeNotifier>
+    implements ViewModelProviderCreate<VM> {
   @protected
   Widget buildProvider(
     BuildContext context,
     Widget? child, {
-    ChildViewModelWidgetBuilder<PVM, VM>? builder,
+    ViewModelWidgetBuilder<VM>? builder,
   }) {
     /// 混入 [ChildViewModelProviderLifecycleMixin] 不再 Provider 注册生命周期
-    final _lifecycle = this is! ChildViewModelProviderLifecycleMixin<PVM, VM>
-        ? this as ChildViewModelProviderLifecycle<PVM, VM>?
+    final _lifecycle = this is! ViewModelProviderLifecycleMixin<VM>
+        ? this as ViewModelProviderLifecycle<VM>?
         : null;
 
-    final _builder = this as ChildViewModelProviderBuilder<PVM, VM>?;
+    final _builder = this as ViewModelProviderBuilder<VM>?;
 
-    return PairChildViewModelProvider(
+    return ChildViewModelProvider(
       create: create,
       initViewModel: _lifecycle?.initViewModel,
       initFrame: _lifecycle?.initFrame,
@@ -62,22 +61,22 @@ abstract class PairChildViewModelProviderMixin<PVM extends ChangeNotifier,
   }
 }
 
-abstract class PairValueViewModelProviderMixin<PVM extends ChangeNotifier,
-        VM extends ChangeNotifier>
-    implements ValueViewModelProviderCreate<PVM, VM> {
+abstract class ValueViewModelProviderMixin<VM extends ChangeNotifier>
+    implements ValueViewModelProviderCreate<VM> {
   @protected
   Widget buildProvider(
     BuildContext context,
     Widget? child, {
-    ChildViewModelWidgetBuilder<PVM, VM>? builder,
+    ViewModelWidgetBuilder<VM>? builder,
   }) {
     /// 混入 [ChildViewModelProviderLifecycleMixin] 不再 Provider 注册生命周期
-    final _lifecycle = this is! ChildViewModelProviderLifecycleMixin<PVM, VM>
-        ? this as ChildViewModelProviderLifecycle<PVM, VM>?
+    final _lifecycle = this is! ViewModelProviderLifecycleMixin<VM>
+        ? this as ViewModelProviderLifecycle<VM>?
         : null;
 
-    final _builder = this as ChildViewModelProviderBuilder<PVM, VM>?;
-    return PairValueViewModelProvider(
+    final _builder = this as ViewModelProviderBuilder<VM>?;
+
+    return ValueViewModelProvider(
       create: create,
       initViewModel: _lifecycle?.initViewModel,
       initFrame: _lifecycle?.initFrame,
@@ -102,7 +101,7 @@ abstract class ViewModelProviderLifecycleMixin<VM>
         builder ?? (this as ViewModelProviderBuilder<VM>?)?.buildChild;
 
     return ViewModelBinding<VM, VM>(
-      selector: (context, pvm) => pvm,
+      selector: (context, vm) => vm,
       builder: (context, value, isBinding, child) => LifecycleBuilder<VM>(
         create: (context) => context.viewModel<VM>(),
         initState: (_) => initViewModel(context, value),
@@ -125,16 +124,72 @@ abstract class ViewModelProviderLifecycleMixin<VM>
   }
 }
 
-abstract class ChildViewModelProviderLifecycleMixin<PVM, VM>
-    implements ChildViewModelProviderLifecycle<PVM, VM> {
+abstract class PairChildViewModelProviderMixin<PVM extends ChangeNotifier,
+    VM extends ChangeNotifier> implements PairViewModelProviderCreate<PVM, VM> {
+  @protected
+  Widget buildProvider(
+    BuildContext context,
+    Widget? child, {
+    PairViewModelWidgetBuilder<PVM, VM>? builder,
+  }) {
+    /// 混入 [ChildViewModelProviderLifecycleMixin] 不再 Provider 注册生命周期
+    final _lifecycle = this is! PairViewModelProviderLifecycleMixin<PVM, VM>
+        ? this as PairViewModelProviderLifecycle<PVM, VM>?
+        : null;
+
+    final _builder = this as PairViewModelProviderBuilder<PVM, VM>?;
+
+    return PairChildViewModelProvider(
+      create: create,
+      initViewModel: _lifecycle?.initViewModel,
+      initFrame: _lifecycle?.initFrame,
+      bindViewModel: _lifecycle?.bindViewModel,
+      disposeViewModel: _lifecycle?.disposeViewModel,
+      changeViewModel: _lifecycle?.changeViewModel,
+      child: child,
+      builder: builder ?? _builder?.buildChild,
+    );
+  }
+}
+
+abstract class PairValueViewModelProviderMixin<PVM extends ChangeNotifier,
+        VM extends ChangeNotifier>
+    implements PairValueViewModelProviderCreate<PVM, VM> {
+  @protected
+  Widget buildProvider(
+    BuildContext context,
+    Widget? child, {
+    PairViewModelWidgetBuilder<PVM, VM>? builder,
+  }) {
+    /// 混入 [ChildViewModelProviderLifecycleMixin] 不再 Provider 注册生命周期
+    final _lifecycle = this is! PairViewModelProviderLifecycleMixin<PVM, VM>
+        ? this as PairViewModelProviderLifecycle<PVM, VM>?
+        : null;
+
+    final _builder = this as PairViewModelProviderBuilder<PVM, VM>?;
+    return PairValueViewModelProvider(
+      create: create,
+      initViewModel: _lifecycle?.initViewModel,
+      initFrame: _lifecycle?.initFrame,
+      bindViewModel: _lifecycle?.bindViewModel,
+      disposeViewModel: _lifecycle?.disposeViewModel,
+      changeViewModel: _lifecycle?.changeViewModel,
+      child: child,
+      builder: builder ?? _builder?.buildChild,
+    );
+  }
+}
+
+abstract class PairViewModelProviderLifecycleMixin<PVM, VM>
+    implements PairViewModelProviderLifecycle<PVM, VM> {
   @protected
   Widget buildChildLifecycle(
     BuildContext context,
     Widget? child, {
-    ChildViewModelWidgetBuilder<PVM, VM>? builder,
+    PairViewModelWidgetBuilder<PVM, VM>? builder,
   }) {
-    final _builder = builder ??
-        (this as ChildViewModelProviderBuilder<PVM, VM>?)?.buildChild;
+    final _builder =
+        builder ?? (this as PairViewModelProviderBuilder<PVM, VM>?)?.buildChild;
 
     return ViewModelBinding<PVM, Tuple2<PVM, VM>>(
       selector: (context, pvm) => Tuple2(pvm, context.viewModel<VM>()),
@@ -168,6 +223,10 @@ abstract class ViewModelProviderCreate<VM> {
   VM create(BuildContext context);
 }
 
+abstract class ValueViewModelProviderCreate<VM> {
+  ValueListenable<VM> create(BuildContext context);
+}
+
 abstract class ViewModelProviderBuilder<VM> {
   Widget buildChild(BuildContext context, VM viewModel, Widget? child);
 }
@@ -184,20 +243,20 @@ abstract class ViewModelProviderLifecycle<VM> {
   void disposeViewModel(BuildContext context, VM viewModel) {}
 }
 
-abstract class ChildViewModelProviderCreate<PVM, VM> {
+abstract class PairViewModelProviderCreate<PVM, VM> {
   VM create(BuildContext context, PVM parent);
 }
 
-abstract class ValueViewModelProviderCreate<PVM, VM> {
+abstract class PairValueViewModelProviderCreate<PVM, VM> {
   ValueListenable<VM> create(BuildContext context, PVM parent);
 }
 
-abstract class ChildViewModelProviderBuilder<PVM, VM> {
+abstract class PairViewModelProviderBuilder<PVM, VM> {
   Widget buildChild(
       BuildContext context, PVM parent, VM viewModel, Widget? child);
 }
 
-abstract class ChildViewModelProviderLifecycle<PVM, VM> {
+abstract class PairViewModelProviderLifecycle<PVM, VM> {
   void initViewModel(BuildContext context, PVM parent, VM viewModel) {}
 
   void initFrame(BuildContext context, PVM parent, VM viewModel) {}

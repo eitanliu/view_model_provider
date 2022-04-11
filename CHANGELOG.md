@@ -1,3 +1,7 @@
+## [1.0.0]
+
+* change ChildViewModelProvider
+
 ## [0.0.9]
 
 * fix bugs initFrame on mixin no call

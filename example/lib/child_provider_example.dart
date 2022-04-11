@@ -68,26 +68,26 @@ class ChildProviderExample extends StatelessWidget {
 }
 
 /// [PairValueViewModelProvider] 获取子 ViewModel 例子
-class ValueViewModelProviderExample extends StatelessWidget {
+class PairValueViewModelProviderExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PairValueViewModelProvider<ParentViewModel, ChildViewModel>(
       create: (_, parent) => parent.valueViewModel,
       initViewModel: (context, parent, viewModel) {
-        debugPrint("ValueViewModelProvider initViewModel $viewModel");
+        debugPrint("PairValueViewModelProvider initViewModel $viewModel");
       },
       bindViewModel: (context, parent, viewModel) {
-        debugPrint("ValueViewModelProvider bindViewModel $viewModel");
+        debugPrint("PairValueViewModelProvider bindViewModel $viewModel");
       },
       disposeViewModel: (context, parent, viewModel) {
-        debugPrint("ValueViewModelProvider disposeViewModel $viewModel");
+        debugPrint("PairValueViewModelProvider disposeViewModel $viewModel");
       },
       changeViewModel: (context, parent, viewModel, oldViewModel) {
         debugPrint(
-            "ValueViewModelProvider changeViewModel $viewModel, $oldViewModel");
+            "PairValueViewModelProvider changeViewModel $viewModel, $oldViewModel");
       },
       builder: (context, parent, viewModel, child) {
-        debugPrint("ValueViewModelProvider builder $viewModel");
+        debugPrint("PairValueViewModelProvider builder $viewModel");
         return Row(
           children: [
             ElevatedButton(
@@ -106,25 +106,155 @@ class ValueViewModelProviderExample extends StatelessWidget {
 }
 
 /// [PairChildViewModelProvider] 获取子 ViewModel 例子
-class ChildViewModelProviderExample extends StatelessWidget {
+class PairChildViewModelProviderExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PairChildViewModelProvider<ParentViewModel, ChildViewModel>(
       create: (_, parent) => parent.childViewModel,
       initViewModel: (context, parent, viewModel) {
-        debugPrint("ChildViewModelProvider initViewModel $viewModel");
+        debugPrint("PairChildViewModelProvider initViewModel $viewModel");
       },
       bindViewModel: (context, parent, viewModel) {
-        debugPrint("ChildViewModelProvider bindViewModel $viewModel");
+        debugPrint("PairChildViewModelProvider bindViewModel $viewModel");
       },
       disposeViewModel: (context, parent, viewModel) {
-        debugPrint("ChildViewModelProvider disposeViewModel $viewModel");
+        debugPrint("PairChildViewModelProvider disposeViewModel $viewModel");
       },
       changeViewModel: (context, parent, viewModel, oldViewModel) {
         debugPrint(
-            "ChildViewModelProvider changeViewModel $viewModel, $oldViewModel");
+            "PairChildViewModelProvider changeViewModel $viewModel, $oldViewModel");
       },
       builder: (context, parent, viewModel, child) {
+        debugPrint("PairChildViewModelProvider builder $viewModel");
+        return Column(
+          children: [
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () => viewModel.addValue(),
+                  child: Text("addValue"),
+                ),
+                ValueListenableBuilder(
+                  valueListenable: viewModel.value,
+                  builder: (context, value, child) =>
+                      Text("${viewModel.value}"),
+                ),
+              ],
+            ),
+            PairSubChildViewModelProviderExample(
+              viewModel: viewModel,
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class PairSubChildViewModelProviderExample extends StatelessWidget {
+  final ChildViewModel viewModel;
+
+  const PairSubChildViewModelProviderExample({
+    Key? key,
+    required this.viewModel,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        ElevatedButton(
+          onPressed: () => viewModel.changeSubChild(),
+          child: Text("change sub"),
+        ),
+        PairValueViewModelProvider<ChildViewModel, SubChildViewModel>(
+          create: (_, parent) => viewModel.subChild,
+          initViewModel: (context, parent, viewModel) {
+            debugPrint("PairSubViewModelProvider initViewModel $viewModel");
+          },
+          bindViewModel: (context, parent, viewModel) {
+            debugPrint("PairSubViewModelProvider bindViewModel $viewModel");
+          },
+          disposeViewModel: (context, parent, viewModel) {
+            debugPrint("PairSubViewModelProvider disposeViewModel $viewModel");
+          },
+          changeViewModel: (context, parent, viewModel, oldViewModel) {
+            debugPrint(
+                "PairSubViewModelProvider changeViewModel ${describeIdentity(viewModel)}, ${describeIdentity(oldViewModel)}");
+          },
+          builder: (context, parent, viewModel, child) {
+            debugPrint(
+                "PairSubViewModelProvider builder ${describeIdentity(viewModel)}");
+            return Row(
+              children: [
+                Text("${describeIdentity(viewModel)}"),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+/// [ValueViewModelProvider] 获取子 ViewModel 例子
+class ValueViewModelProviderExample extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ValueViewModelProvider<ChildViewModel>(
+      create: (context) => context.watch<ParentViewModel>().valueViewModel,
+      initViewModel: (context, viewModel) {
+        debugPrint("ValueViewModelProvider initViewModel $viewModel");
+      },
+      bindViewModel: (context, viewModel) {
+        debugPrint("ValueViewModelProvider bindViewModel $viewModel");
+      },
+      disposeViewModel: (context, viewModel) {
+        debugPrint("ValueViewModelProvider disposeViewModel $viewModel");
+      },
+      changeViewModel: (context, viewModel, oldViewModel) {
+        debugPrint(
+            "ValueViewModelProvider changeViewModel $viewModel, $oldViewModel");
+      },
+      builder: (context, viewModel, child) {
+        debugPrint("ValueViewModelProvider builder $viewModel");
+        return Row(
+          children: [
+            ElevatedButton(
+              onPressed: () => viewModel.addValue(),
+              child: Text("addValue"),
+            ),
+            ValueListenableBuilder(
+              valueListenable: viewModel.value,
+              builder: (context, value, child) => Text("${viewModel.value}"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// [ChildViewModelProvider] 获取子 ViewModel 例子
+class ChildViewModelProviderExample extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ChildViewModelProvider<ChildViewModel>(
+      create: (context) => context.watch<ParentViewModel>().childViewModel,
+      initViewModel: (context, viewModel) {
+        debugPrint("ChildViewModelProvider initViewModel $viewModel");
+      },
+      bindViewModel: (context, viewModel) {
+        debugPrint("ChildViewModelProvider bindViewModel $viewModel");
+      },
+      disposeViewModel: (context, viewModel) {
+        debugPrint("ChildViewModelProvider disposeViewModel $viewModel");
+      },
+      changeViewModel: (context, viewModel, oldViewModel) {
+        debugPrint(
+            "ChildViewModelProvider changeViewModel $viewModel, $oldViewModel");
+      },
+      builder: (context, viewModel, child) {
         debugPrint("ChildViewModelProvider builder $viewModel");
         return Column(
           children: [
@@ -167,22 +297,22 @@ class SubChildViewModelProviderExample extends StatelessWidget {
           onPressed: () => viewModel.changeSubChild(),
           child: Text("change sub"),
         ),
-        PairValueViewModelProvider<ChildViewModel, SubChildViewModel>(
-          create: (_, parent) => viewModel.subChild,
-          initViewModel: (context, parent, viewModel) {
+        ValueViewModelProvider<SubChildViewModel>(
+          create: (context) => viewModel.subChild,
+          initViewModel: (context, viewModel) {
             debugPrint("SubViewModelProvider initViewModel $viewModel");
           },
-          bindViewModel: (context, parent, viewModel) {
+          bindViewModel: (context, viewModel) {
             debugPrint("SubViewModelProvider bindViewModel $viewModel");
           },
-          disposeViewModel: (context, parent, viewModel) {
+          disposeViewModel: (context, viewModel) {
             debugPrint("SubViewModelProvider disposeViewModel $viewModel");
           },
-          changeViewModel: (context, parent, viewModel, oldViewModel) {
+          changeViewModel: (context, viewModel, oldViewModel) {
             debugPrint(
                 "SubViewModelProvider changeViewModel ${describeIdentity(viewModel)}, ${describeIdentity(oldViewModel)}");
           },
-          builder: (context, parent, viewModel, child) {
+          builder: (context, viewModel, child) {
             debugPrint(
                 "SubViewModelProvider builder ${describeIdentity(viewModel)}");
             return Row(
