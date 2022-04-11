@@ -114,7 +114,7 @@ class ItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     /// [ChildViewModelProvider]取出[ListNotifier]列表数据，管理Item刷新范围
-    return ChildViewModelProvider<ParentViewModel, ItemViewModel>(
+    return PairChildViewModelProvider<ParentViewModel, ItemViewModel>(
       create: (_, parent) => parent.list[index],
       initViewModel: (context, parent, viewModel) {
         debugPrint("ItemWidget initViewModel $index, $viewModel");

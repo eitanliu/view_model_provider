@@ -33,7 +33,7 @@ abstract class ViewModelProviderMixin<VM extends ChangeNotifier>
   }
 }
 
-abstract class ChildViewModelProviderMixin<PVM extends ChangeNotifier,
+abstract class PairChildViewModelProviderMixin<PVM extends ChangeNotifier,
         VM extends ChangeNotifier>
     implements ChildViewModelProviderCreate<PVM, VM> {
   @protected
@@ -49,7 +49,7 @@ abstract class ChildViewModelProviderMixin<PVM extends ChangeNotifier,
 
     final _builder = this as ChildViewModelProviderBuilder<PVM, VM>?;
 
-    return ChildViewModelProvider(
+    return PairChildViewModelProvider(
       create: create,
       initViewModel: _lifecycle?.initViewModel,
       initFrame: _lifecycle?.initFrame,
@@ -62,7 +62,7 @@ abstract class ChildViewModelProviderMixin<PVM extends ChangeNotifier,
   }
 }
 
-abstract class ValueViewModelProviderMixin<PVM extends ChangeNotifier,
+abstract class PairValueViewModelProviderMixin<PVM extends ChangeNotifier,
         VM extends ChangeNotifier>
     implements ValueViewModelProviderCreate<PVM, VM> {
   @protected
@@ -77,7 +77,7 @@ abstract class ValueViewModelProviderMixin<PVM extends ChangeNotifier,
         : null;
 
     final _builder = this as ChildViewModelProviderBuilder<PVM, VM>?;
-    return ValueViewModelProvider(
+    return PairValueViewModelProvider(
       create: create,
       initViewModel: _lifecycle?.initViewModel,
       initFrame: _lifecycle?.initFrame,

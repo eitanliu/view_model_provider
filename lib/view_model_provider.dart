@@ -16,6 +16,9 @@ export 'view_model_provider_mixin.dart';
 typedef ViewModelWidgetCallback<VM> = void Function(
     BuildContext context, VM viewModel);
 
+typedef ViewModelWidgetChange<VM> = void Function(
+    BuildContext context, VM viewModel, VM? oldViewModel);
+
 typedef ViewModelWidgetBuilder<VM> = Widget Function(
     BuildContext context, VM viewModel, Widget? child);
 
@@ -89,7 +92,7 @@ class ViewModelProvider<VM extends ChangeNotifier>
   }
 }
 
-class ChildViewModelProvider<PVM extends ChangeNotifier,
+class PairChildViewModelProvider<PVM extends ChangeNotifier,
     VM extends ChangeNotifier> extends SingleChildStatelessWidget {
   final VM Function(BuildContext context, PVM parent) create;
 
@@ -105,7 +108,7 @@ class ChildViewModelProvider<PVM extends ChangeNotifier,
 
   final ChildViewModelWidgetBuilder<PVM, VM>? builder;
 
-  ChildViewModelProvider({
+  PairChildViewModelProvider({
     Key? key,
     required this.create,
     this.initViewModel,
@@ -170,7 +173,7 @@ class ChildViewModelProvider<PVM extends ChangeNotifier,
   }
 }
 
-class ValueViewModelProvider<PVM extends ChangeNotifier,
+class PairValueViewModelProvider<PVM extends ChangeNotifier,
     VM extends ChangeNotifier> extends SingleChildStatelessWidget {
   final ValueListenable<VM> Function(BuildContext context, PVM parent) create;
 
@@ -186,7 +189,7 @@ class ValueViewModelProvider<PVM extends ChangeNotifier,
 
   final ChildViewModelWidgetBuilder<PVM, VM>? builder;
 
-  ValueViewModelProvider({
+  PairValueViewModelProvider({
     Key? key,
     required this.create,
     this.initViewModel,
@@ -269,7 +272,7 @@ abstract class ViewModelProviderWidget<VM extends ChangeNotifier>
 
 abstract class ChildViewModelProviderWidget<PVM extends ChangeNotifier,
         VM extends ChangeNotifier> extends SingleChildStatelessWidget
-    with ChildViewModelProviderMixin<PVM, VM> {
+    with PairChildViewModelProviderMixin<PVM, VM> {
   ChildViewModelProviderWidget({
     Key? key,
     Widget? child,
@@ -283,7 +286,7 @@ abstract class ChildViewModelProviderWidget<PVM extends ChangeNotifier,
 
 abstract class ValueViewModelProviderWidget<PVM extends ChangeNotifier,
         VM extends ChangeNotifier> extends SingleChildStatelessWidget
-    with ValueViewModelProviderMixin<PVM, VM>
+    with PairValueViewModelProviderMixin<PVM, VM>
     implements ChildViewModelProviderBuilder<PVM, VM> {
   ValueViewModelProviderWidget({
     Key? key,
