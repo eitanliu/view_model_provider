@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:flutter/services.dart';
-import 'package:view_model_provider/view_model_provider.dart';
 
 import 'child_provider_example.dart';
 import 'list_example.dart';

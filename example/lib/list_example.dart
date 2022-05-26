@@ -88,7 +88,7 @@ class ListProviderExapmle extends StatelessWidget {
                 Expanded(
                   /// [ListListenableBuilder] 监听列表变化进行刷新
                   child: ListListenableBuilder<ItemViewModel>(
-                    listListenable: viewModel.list,
+                    listenable: viewModel.list,
                     builder: (context, value, child) => ListView.builder(
                       itemCount: value.length,
                       itemBuilder: (context, index) {

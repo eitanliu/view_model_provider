@@ -9,29 +9,37 @@ import 'list_notifier.dart';
 
 export 'package:tuple/tuple.dart';
 
+/// [Tuple2] WidgetBuilder
 typedef ValueTuple2WidgetBuilder<T, T2> = Widget Function(
     BuildContext context, Tuple2<T, T2> value, Widget? child);
 
+/// [Tuple3] WidgetBuilder
 typedef ValueTuple3WidgetBuilder<T, T2, T3> = Widget Function(
     BuildContext context, Tuple3<T, T2, T3> value, Widget? child);
 
+/// [Tuple4] WidgetBuilder
 typedef ValueTuple4WidgetBuilder<T, T2, T3, T4> = Widget Function(
     BuildContext context, Tuple4<T, T2, T3, T4> value, Widget? child);
 
+/// [Tuple5] WidgetBuilder
 typedef ValueTuple5WidgetBuilder<T, T2, T3, T4, T5> = Widget Function(
     BuildContext context, Tuple5<T, T2, T3, T4, T5> value, Widget? child);
 
+/// [Tuple6] WidgetBuilder
 typedef ValueTuple6WidgetBuilder<T, T2, T3, T4, T5, T6> = Widget Function(
     BuildContext context, Tuple6<T, T2, T3, T4, T5, T6> value, Widget? child);
 
+/// [Tuple7] WidgetBuilder
 typedef ValueTuple7WidgetBuilder<T, T2, T3, T4, T5, T6, T7> = Widget Function(
     BuildContext context,
     Tuple7<T, T2, T3, T4, T5, T6, T7> value,
     Widget? child);
 
+/// [List] WidgetBuilder
 typedef ValueListWidgetBuilder<T> = Widget Function(
     BuildContext context, List<T> value, Widget? child);
 
+/// Tuple2<ValueListenable> 变化监听
 class ValueListenableTuple2Builder<T, T2> extends ValueListenableListBuilder {
   ValueListenableTuple2Builder({
     Key? key,
@@ -48,6 +56,7 @@ class ValueListenableTuple2Builder<T, T2> extends ValueListenableListBuilder {
         );
 }
 
+/// Tuple3<ValueListenable> 变化监听
 class ValueListenableTuple3Builder<T, T2, T3>
     extends ValueListenableListBuilder {
   ValueListenableTuple3Builder({
@@ -67,6 +76,7 @@ class ValueListenableTuple3Builder<T, T2, T3>
         );
 }
 
+/// Tuple4<ValueListenable> 变化监听
 class ValueListenableTuple4Builder<T, T2, T3, T4>
     extends ValueListenableListBuilder {
   ValueListenableTuple4Builder({
@@ -86,6 +96,7 @@ class ValueListenableTuple4Builder<T, T2, T3, T4>
         );
 }
 
+/// Tuple5<ValueListenable> 变化监听
 class ValueListenableTuple5Builder<T, T2, T3, T4, T5>
     extends ValueListenableListBuilder {
   ValueListenableTuple5Builder({
@@ -105,6 +116,7 @@ class ValueListenableTuple5Builder<T, T2, T3, T4, T5>
         );
 }
 
+/// Tuple6<ValueListenable> 变化监听
 class ValueListenableTuple6Builder<T, T2, T3, T4, T5, T6>
     extends ValueListenableListBuilder {
   ValueListenableTuple6Builder({
@@ -129,6 +141,7 @@ class ValueListenableTuple6Builder<T, T2, T3, T4, T5, T6>
         );
 }
 
+/// Tuple7<ValueListenable> 变化监听
 class ValueListenableTuple7Builder<T, T2, T3, T4, T5, T6, T7>
     extends ValueListenableListBuilder {
   ValueListenableTuple7Builder({
@@ -154,6 +167,7 @@ class ValueListenableTuple7Builder<T, T2, T3, T4, T5, T6, T7>
         );
 }
 
+/// 多个 [ValueListenable] 变化监听
 class ValueListenableListBuilder<T> extends StatefulWidget {
   const ValueListenableListBuilder({
     Key? key,
@@ -221,17 +235,19 @@ class _ValueListenableListBuilderState<T>
   }
 }
 
+/// [ListListenable] 变化监听
+/// [ListListenable] 是可监听[List]的包装类
 class ListListenableBuilder<T>
     extends ListenableBuilder<ListListenable<T>, List<T>> {
   ListListenableBuilder({
     Key? key,
-    required ListListenable<T> listListenable,
+    required ListListenable<T> listenable,
     ShouldRebuild<List<T>>? shouldRebuild,
     required ValueWidgetBuilder<List<T>> builder,
     Widget? child,
   }) : super(
           key: key,
-          listenable: listListenable,
+          listenable: listenable,
           selector: (ListListenable<T> listenable) => List.of(listenable.value),
           shouldRebuild: shouldRebuild,
           builder: builder,
@@ -239,6 +255,7 @@ class ListListenableBuilder<T>
         );
 }
 
+/// Listenable 变化监听
 class ListenableBuilder<T extends Listenable, S> extends StatefulWidget {
   ListenableBuilder({
     Key? key,

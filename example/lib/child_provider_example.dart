@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:view_model_provider/pair_view_model_provider.dart';
 import 'package:view_model_provider/view_model_provider.dart';
 
 class ParentViewModel extends ChangeNotifier {

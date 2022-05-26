@@ -3,14 +3,26 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
-class ListNotifier<E> extends ListListenable<E> {
-  ListNotifier([List<E>? list]) : super(list ?? List<E>.empty(growable: true));
+/// 可监听 [List] 实现
+class ListNotifier<E> extends AbstractListNotifier<E> {
+  List<E> _value;
+
+  ListNotifier([List<E>? list])
+      : _value = list ?? List<E>.empty(growable: true);
+
+  @override
+  List<E> get value => _value;
 
   set value(List<E> newValue) {
-    if (const DeepCollectionEquality().equals(_value, newValue)) return;
+    if (const DeepCollectionEquality().equals(value, newValue)) return;
     _value = newValue;
     notifyListeners();
   }
+}
+
+/// [List] 变化调用 [notifyListeners] 通知刷新
+abstract class AbstractListNotifier<E> extends ListListenable<E> {
+  // set value(List<E> newValue);
 
   @override
   void operator []=(int index, E value) {
@@ -142,275 +154,270 @@ class ListNotifier<E> extends ListListenable<E> {
   }
 }
 
-class ListListenable<E> extends IterableListenable<List<E>, E>
+/// 可监听 [List]
+abstract class ListListenable<E> extends IterableListenable<List<E>, E>
     implements List<E> {
-  ListListenable(List<E> list) : super(list);
-
   @override
   List<R> cast<R>() {
-    return _value.cast<R>();
+    return value.cast<R>();
   }
 
   @override
   E operator [](int index) {
-    return _value[index];
+    return value[index];
   }
 
   @override
   void operator []=(int index, E value) {
-    _value[index] = value;
+    this.value[index] = value;
   }
 
   @override
   set first(E value) {
-    _value.first = value;
+    this.value.first = value;
   }
 
   @override
   set last(E value) {
-    _value.last = value;
+    this.value.last = value;
   }
 
   @override
   set length(int newLength) {
-    _value.length = newLength;
+    value.length = newLength;
   }
 
   @override
   void add(E value) {
-    _value.add(value);
+    this.value.add(value);
   }
 
   @override
   void addAll(Iterable<E> iterable) {
-    _value.addAll(iterable);
+    value.addAll(iterable);
   }
 
   @override
-  Iterable<E> get reversed => _value.reversed;
+  Iterable<E> get reversed => value.reversed;
 
   @override
   void sort([int compare(E a, E b)?]) {
-    _value.sort(compare);
+    value.sort(compare);
   }
 
   @override
   void shuffle([Random? random]) {
-    _value.shuffle(random);
+    value.shuffle(random);
   }
 
   @override
-  int indexOf(E element, [int start = 0]) => _value.indexOf(element, start);
+  int indexOf(E element, [int start = 0]) => value.indexOf(element, start);
 
   @override
   int indexWhere(bool test(E element), [int start = 0]) =>
-      _value.indexWhere(test, start);
+      value.indexWhere(test, start);
 
   @override
   int lastIndexWhere(bool test(E element), [int? start]) =>
-      _value.lastIndexWhere(test, start);
+      value.lastIndexWhere(test, start);
 
   @override
-  int lastIndexOf(E element, [int? start]) =>
-      _value.lastIndexOf(element, start);
+  int lastIndexOf(E element, [int? start]) => value.lastIndexOf(element, start);
 
   @override
   void clear() {
-    _value.clear();
+    value.clear();
   }
 
   @override
   void insert(int index, E element) {
-    _value.insert(index, element);
+    value.insert(index, element);
   }
 
   @override
   void insertAll(int index, Iterable<E> iterable) {
-    _value.insertAll(index, iterable);
+    value.insertAll(index, iterable);
   }
 
   @override
   void setAll(int index, Iterable<E> iterable) {
-    _value.setAll(index, iterable);
+    value.setAll(index, iterable);
   }
 
   @override
   bool remove(Object? value) {
-    return _value.remove(value);
+    return this.value.remove(value);
   }
 
   @override
   E removeAt(int index) {
-    return _value.removeAt(index);
+    return value.removeAt(index);
   }
 
   @override
   E removeLast() {
-    return _value.removeLast();
+    return value.removeLast();
   }
 
   @override
   void removeWhere(bool test(E element)) {
-    _value.removeWhere(test);
+    value.removeWhere(test);
   }
 
   @override
   void retainWhere(bool test(E element)) {
-    _value.retainWhere(test);
+    value.retainWhere(test);
   }
 
   @override
   List<E> operator +(List<E> other) {
-    return _value + other;
+    return value + other;
   }
 
   @override
-  List<E> sublist(int start, [int? end]) => _value.sublist(start, end);
+  List<E> sublist(int start, [int? end]) => value.sublist(start, end);
 
   @override
-  Iterable<E> getRange(int start, int end) => _value.getRange(start, end);
+  Iterable<E> getRange(int start, int end) => value.getRange(start, end);
 
   @override
   void setRange(int start, int end, Iterable<E> iterable, [int skipCount = 0]) {
-    _value.setRange(start, end, iterable);
+    value.setRange(start, end, iterable);
   }
 
   @override
   void removeRange(int start, int end) {
-    _value.removeRange(start, end);
+    value.removeRange(start, end);
   }
 
   @override
   void fillRange(int start, int end, [E? fillValue]) {
-    _value.fillRange(start, end, fillValue);
+    value.fillRange(start, end, fillValue);
   }
 
   @override
   void replaceRange(int start, int end, Iterable<E> replacement) {
-    _value.replaceRange(start, end, replacement);
+    value.replaceRange(start, end, replacement);
   }
 
   @override
-  Map<int, E> asMap() => _value.asMap();
+  Map<int, E> asMap() => value.asMap();
 
   @override
-  bool operator ==(Object other) => _value == other;
+  bool operator ==(Object other) => value == other;
 
   @override
-  int get hashCode => _value.hashCode;
+  int get hashCode => value.hashCode;
 }
 
-class IterableListenable<T extends Iterable<E>, E> extends ChangeNotifier
-    implements Iterable<E>, ValueListenable<T> {
-  T _value;
-
-  IterableListenable(T list) : _value = list;
-
+/// 可监听 [Iterable]
+abstract class IterableListenable<T extends Iterable<E>, E>
+    extends ChangeNotifier implements Iterable<E>, ValueListenable<T> {
   void notifyChange() => notifyListeners();
 
-  @override
-  T get value => _value;
+  // @override
+  // abstract T value;
 
   @override
-  Iterator<E> get iterator => _value.iterator;
+  Iterator<E> get iterator => value.iterator;
 
   @override
-  Iterable<R> cast<R>() => _value.cast<R>();
+  Iterable<R> cast<R>() => value.cast<R>();
 
   @override
-  Iterable<E> followedBy(Iterable<E> other) => _value.followedBy(other);
+  Iterable<E> followedBy(Iterable<E> other) => value.followedBy(other);
 
   @override
-  Iterable<T> map<T>(T f(E e)) => _value.map(f);
+  Iterable<T> map<T>(T f(E e)) => value.map(f);
 
   @override
-  Iterable<E> where(bool test(E element)) => _value.where(test);
+  Iterable<E> where(bool test(E element)) => value.where(test);
 
   @override
-  Iterable<T> whereType<T>() => _value.whereType();
+  Iterable<T> whereType<T>() => value.whereType();
 
   @override
-  Iterable<T> expand<T>(Iterable<T> f(E element)) => _value.expand(f);
+  Iterable<T> expand<T>(Iterable<T> f(E element)) => value.expand(f);
 
   @override
-  bool contains(Object? element) => _value.contains(element);
+  bool contains(Object? element) => value.contains(element);
 
   @override
-  void forEach(void f(E element)) => _value.forEach(f);
+  void forEach(void f(E element)) => value.forEach(f);
 
   @override
-  E reduce(E combine(E value, E element)) => _value.reduce(combine);
+  E reduce(E combine(E value, E element)) => value.reduce(combine);
 
   @override
   T fold<T>(T initialValue, T combine(T previousValue, E element)) =>
-      _value.fold(initialValue, combine);
+      value.fold(initialValue, combine);
 
   @override
-  bool every(bool test(E element)) => _value.every(test);
+  bool every(bool test(E element)) => value.every(test);
 
   @override
-  String join([String separator = ""]) => _value.join(separator);
+  String join([String separator = ""]) => value.join(separator);
 
   @override
-  bool any(bool test(E element)) => _value.any(test);
+  bool any(bool test(E element)) => value.any(test);
 
   @override
-  List<E> toList({bool growable = true}) => _value.toList(growable: growable);
+  List<E> toList({bool growable = true}) => value.toList(growable: growable);
 
   @override
-  Set<E> toSet() => _value.toSet();
+  Set<E> toSet() => value.toSet();
 
   @override
-  int get length => _value.length;
+  int get length => value.length;
 
   @override
-  bool get isEmpty => _value.isEmpty;
+  bool get isEmpty => value.isEmpty;
 
   @override
-  bool get isNotEmpty => _value.isNotEmpty;
+  bool get isNotEmpty => value.isNotEmpty;
 
   @override
-  Iterable<E> take(int count) => _value.take(count);
+  Iterable<E> take(int count) => value.take(count);
 
   @override
-  Iterable<E> takeWhile(bool test(E value)) => _value.takeWhile(test);
+  Iterable<E> takeWhile(bool test(E value)) => value.takeWhile(test);
 
   @override
-  Iterable<E> skip(int count) => _value.skip(count);
+  Iterable<E> skip(int count) => value.skip(count);
 
   @override
-  Iterable<E> skipWhile(bool test(E value)) => _value.skipWhile(test);
+  Iterable<E> skipWhile(bool test(E value)) => value.skipWhile(test);
 
   @override
-  E get first => _value.first;
+  E get first => value.first;
 
   @override
-  E get last => _value.last;
+  E get last => value.last;
 
   @override
-  E get single => _value.single;
+  E get single => value.single;
 
   @override
   E firstWhere(bool test(E element), {E orElse()?}) =>
-      _value.firstWhere(test, orElse: orElse);
+      value.firstWhere(test, orElse: orElse);
 
   @override
   E lastWhere(bool test(E element), {E orElse()?}) =>
-      _value.lastWhere(test, orElse: orElse);
+      value.lastWhere(test, orElse: orElse);
 
   @override
   E singleWhere(bool test(E element), {E orElse()?}) =>
-      _value.singleWhere(test, orElse: orElse);
+      value.singleWhere(test, orElse: orElse);
 
   @override
-  E elementAt(int index) => _value.elementAt(index);
+  E elementAt(int index) => value.elementAt(index);
 
   @override
-  String toString() => _value.toString();
+  String toString() => value.toString();
 
   @override
-  bool operator ==(Object other) => _value == other;
+  bool operator ==(Object other) => value == other;
 
   @override
-  int get hashCode => _value.hashCode;
+  int get hashCode => value.hashCode;
 }

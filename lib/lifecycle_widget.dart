@@ -5,21 +5,30 @@ import 'package:provider/single_child_widget.dart';
 class LifecycleBuilder<T> extends SingleChildStatefulWidget {
   final T Function(BuildContext context)? create;
 
+  /// [State.initState] callback
   final Function(BuildContext context)? initState;
 
+  /// first [SingleChildState.buildWithChild] callback
   final Function(BuildContext context, T value)? initBuild;
 
+  /// 首帧执行
+  /// [SchedulerBinding.addPostFrameCallback]
   final Function(BuildContext context, T value)? initFrame;
 
+  /// [State.deactivate] callback
   final Function(BuildContext context, T value)? deactivate;
 
+  /// [State.dispose] callback
   final Function(BuildContext context, T value)? dispose;
 
+  /// [State.didUpdateWidget] callback
   final Function(BuildContext context, T? oldValue, LifecycleBuilder oldWidget)?
       didUpdateWidget;
 
+  /// [State.didChangeDependencies] callback
   final Function(BuildContext context, T? oldValue)? didChangeDependencies;
 
+  /// getter [State.setState] functions
   final Function(BuildContext context, StateSetter setState)? state;
 
   final Widget Function(
@@ -49,13 +58,16 @@ class _LifecycleWidgetState<T> extends SingleChildState<LifecycleBuilder<T>> {
   T? value;
   bool _firstBuilder = true;
 
+  static T? _castNullable<T>(T? value) => value;
+
   @override
   void initState() {
     super.initState();
     widget.initState?.call(context);
-    if (widget.initFrame != null) {
-      WidgetsBinding.instance!.addPostFrameCallback((_) {
-        widget.initFrame!(context, value as T);
+    final initFrame = widget.initFrame;
+    if (initFrame != null) {
+      _castNullable(WidgetsBinding.instance)!.addPostFrameCallback((_) {
+        initFrame(context, value as T);
       });
     }
   }

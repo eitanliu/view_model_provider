@@ -7,17 +7,21 @@ import 'view_model_provider.dart';
 export 'value_listenable_list_builder.dart';
 export 'view_model_provider.dart';
 
+/// [Tuple2] ValueListenable
 typedef ViewModelValueTuple2<VM, T, T2>
     = Tuple2<ValueListenable<T>, ValueListenable<T2>> Function(VM viewModel);
 
+/// [Tuple3] ValueListenable
 typedef ViewModelValueTuple3<VM, T, T2, T3>
     = Tuple3<ValueListenable<T>, ValueListenable<T2>, ValueListenable<T3>>
         Function(VM viewModel);
 
+/// [Tuple4] ValueListenable
 typedef ViewModelValueTuple4<VM, T, T2, T3, T4> = Tuple4<ValueListenable<T>,
         ValueListenable<T2>, ValueListenable<T3>, ValueListenable<T4>>
     Function(VM viewModel);
 
+/// [Tuple5] ValueListenable
 typedef ViewModelValueTuple5<VM, T, T2, T3, T4, T5> = Tuple5<
         ValueListenable<T>,
         ValueListenable<T2>,
@@ -26,6 +30,7 @@ typedef ViewModelValueTuple5<VM, T, T2, T3, T4, T5> = Tuple5<
         ValueListenable<T5>>
     Function(VM viewModel);
 
+/// [Tuple6] ValueListenable
 typedef ViewModelValueTuple6<VM, T, T2, T3, T4, T5, T6> = Tuple6<
         ValueListenable<T>,
         ValueListenable<T2>,
@@ -35,6 +40,7 @@ typedef ViewModelValueTuple6<VM, T, T2, T3, T4, T5, T6> = Tuple6<
         ValueListenable<T6>>
     Function(VM viewModel);
 
+/// [Tuple7] ValueListenable
 typedef ViewModelValueTuple7<VM, T, T2, T3, T4, T5, T6, T7> = Tuple7<
         ValueListenable<T>,
         ValueListenable<T2>,
@@ -45,39 +51,49 @@ typedef ViewModelValueTuple7<VM, T, T2, T3, T4, T5, T6, T7> = Tuple7<
         ValueListenable<T7>>
     Function(VM viewModel);
 
+/// List<ValueListenable>
 typedef ViewModelValueList<VM, T> = List<ValueListenable<T>> Function(
     VM viewModel);
 
+/// WidgetBuilder
 typedef ViewModelValueTuple2WidgetBuilder<VM, T, T2> = Widget Function(
     BuildContext context, VM viewModel, Tuple2<T, T2> value, Widget? child);
 
+/// WidgetBuilder
 typedef ViewModelValueTuple3WidgetBuilder<VM, T, T2, T3> = Widget Function(
     BuildContext context, VM viewModel, Tuple3<T, T2, T3> value, Widget? child);
 
+/// WidgetBuilder
 typedef ViewModelValueTuple4WidgetBuilder<VM, T, T2, T3, T4> = Widget Function(
     BuildContext context,
     VM viewModel,
     Tuple4<T, T2, T3, T4> value,
     Widget? child);
 
+/// WidgetBuilder
 typedef ViewModelValueTuple5WidgetBuilder<VM, T, T2, T3, T4, T5>
     = Widget Function(BuildContext context, VM viewModel,
         Tuple5<T, T2, T3, T4, T5> value, Widget? child);
 
+/// WidgetBuilder
 typedef ViewModelValueTuple6WidgetBuilder<VM, T, T2, T3, T4, T5, T6>
     = Widget Function(BuildContext context, VM viewModel,
         Tuple6<T, T2, T3, T4, T5, T6> value, Widget? child);
 
+/// WidgetBuilder
 typedef ViewModelValueTuple7WidgetBuilder<VM, T, T2, T3, T4, T5, T6, T7>
     = Widget Function(BuildContext context, VM viewModel,
         Tuple7<T, T2, T3, T4, T5, T6, T7> value, Widget? child);
 
+/// WidgetBuilder
 typedef ViewModelValueListWidgetBuilder<VM, T> = Widget Function(
     BuildContext context, VM viewModel, List<T> value, Widget? child);
 
+/// WidgetBuilder
 typedef ViewModelValueWidgetBuilder<VM, T> = Widget Function(
     BuildContext context, VM viewModel, T value, Widget? child);
 
+/// 监听ViewModel中[Tuple2]值变化
 class ViewModelValueTuple2Builder<VM extends ChangeNotifier, T, T2>
     extends ViewModelValueListBuilder<VM, dynamic> {
   ViewModelValueTuple2Builder({
@@ -95,6 +111,7 @@ class ViewModelValueTuple2Builder<VM extends ChangeNotifier, T, T2>
         );
 }
 
+/// 监听ViewModel中[Tuple3]值变化
 class ViewModelValueTuple3Builder<VM extends ChangeNotifier, T, T2, T3>
     extends ViewModelValueListBuilder<VM, dynamic> {
   ViewModelValueTuple3Builder({
@@ -112,6 +129,7 @@ class ViewModelValueTuple3Builder<VM extends ChangeNotifier, T, T2, T3>
         );
 }
 
+/// 监听ViewModel中[Tuple4]值变化
 class ViewModelValueTuple4Builder<VM extends ChangeNotifier, T, T2, T3, T4>
     extends ViewModelValueListBuilder<VM, dynamic> {
   ViewModelValueTuple4Builder({
@@ -129,6 +147,7 @@ class ViewModelValueTuple4Builder<VM extends ChangeNotifier, T, T2, T3, T4>
         );
 }
 
+/// 监听ViewModel中[Tuple5]值变化
 class ViewModelValueTuple5Builder<VM extends ChangeNotifier, T, T2, T3, T4, T5>
     extends ViewModelValueListBuilder<VM, dynamic> {
   ViewModelValueTuple5Builder({
@@ -146,6 +165,7 @@ class ViewModelValueTuple5Builder<VM extends ChangeNotifier, T, T2, T3, T4, T5>
         );
 }
 
+/// 监听ViewModel中[Tuple6]值变化
 class ViewModelValueTuple6Builder<VM extends ChangeNotifier, T, T2, T3, T4, T5,
     T6> extends ViewModelValueListBuilder<VM, dynamic> {
   ViewModelValueTuple6Builder({
@@ -164,6 +184,7 @@ class ViewModelValueTuple6Builder<VM extends ChangeNotifier, T, T2, T3, T4, T5,
         );
 }
 
+/// 监听ViewModel中[Tuple7]值变化
 class ViewModelValueTuple7Builder<VM extends ChangeNotifier, T, T2, T3, T4, T5,
     T6, T7> extends ViewModelValueListBuilder<VM, dynamic> {
   ViewModelValueTuple7Builder({
@@ -183,6 +204,7 @@ class ViewModelValueTuple7Builder<VM extends ChangeNotifier, T, T2, T3, T4, T5,
         );
 }
 
+/// 监听ViewModel中多个值变化
 class ViewModelValueListBuilder<VM extends ChangeNotifier, T>
     extends SingleChildStatelessWidget {
   final ViewModelValueList<VM, T> valueListenables;
@@ -211,6 +233,7 @@ class ViewModelValueListBuilder<VM extends ChangeNotifier, T>
   }
 }
 
+/// 监听ViewModel中一个值变化
 class ViewModelValueBuilder<VM extends ChangeNotifier, T>
     extends SingleChildStatelessWidget {
   final ValueListenable<T> Function(VM viewModel) valueListenable;
@@ -243,6 +266,7 @@ class ViewModelValueBuilder<VM extends ChangeNotifier, T>
   }
 }
 
+/// 根据泛型获取ViewModel
 class ViewModelBuilder<VM extends ChangeNotifier>
     extends SingleChildStatelessWidget {
   final ViewModelWidgetBuilder<VM> builder;

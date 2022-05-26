@@ -5,9 +5,11 @@ import 'package:provider/single_child_widget.dart';
 
 export 'package:provider/provider.dart';
 
+/// WidgetBuilder
 typedef ViewModelBindingWidgetBuilder<T> = Widget Function(
     BuildContext context, T value, bool isBinding, Widget? child);
 
+/// Selector0
 class ViewModelBinding0<T> extends SingleChildStatefulWidget {
   ViewModelBinding0({
     Key? key,
@@ -33,6 +35,8 @@ class _ViewModelBinding0State<T>
   T? value;
   late Widget cache;
   Widget? oldWidget;
+
+  /// 是否首次[build]
   bool isBinding = true;
 
   @override
@@ -60,6 +64,7 @@ class _ViewModelBinding0State<T>
   }
 }
 
+/// Selector
 class ViewModelBinding<A, S> extends ViewModelBinding0<S> {
   ViewModelBinding({
     Key? key,

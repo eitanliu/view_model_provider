@@ -1,3 +1,8 @@
+## [1.0.1]
+
+* upgrade flutter 3.0
+* move pair viewmodel
+
 ## [1.0.0]
 
 * change ChildViewModelProvider
