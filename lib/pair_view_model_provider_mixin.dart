@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:tuple/tuple.dart';
+import 'extension/object_extension.dart';
 
 import 'lifecycle_widget.dart';
 import 'pair_view_model_provider.dart';
@@ -48,10 +49,10 @@ abstract class PairChildViewModelProviderMixin<PVM extends ChangeNotifier,
   }) {
     /// 混入 [ChildViewModelProviderLifecycleMixin] 不再 Provider 注册生命周期
     final _lifecycle = this is! PairViewModelProviderLifecycleMixin<PVM, VM>
-        ? this as PairViewModelProviderLifecycle<PVM, VM>?
+        ? this.asSafeType<PairViewModelProviderLifecycle<PVM, VM>>()
         : null;
 
-    final _builder = this as PairViewModelProviderBuilder<PVM, VM>?;
+    final _builder = this.asSafeType<PairViewModelProviderBuilder<PVM, VM>>();
 
     return PairChildViewModelProvider(
       create: create,
@@ -78,10 +79,10 @@ abstract class PairValueViewModelProviderMixin<PVM extends ChangeNotifier,
   }) {
     /// 混入 [ChildViewModelProviderLifecycleMixin] 不再 Provider 注册生命周期
     final _lifecycle = this is! PairViewModelProviderLifecycleMixin<PVM, VM>
-        ? this as PairViewModelProviderLifecycle<PVM, VM>?
+        ? this.asSafeType<PairViewModelProviderLifecycle<PVM, VM>>()
         : null;
 
-    final _builder = this as PairViewModelProviderBuilder<PVM, VM>?;
+    final _builder = this.asSafeType<PairViewModelProviderBuilder<PVM, VM>>();
     return PairValueViewModelProvider(
       create: create,
       initViewModel: _lifecycle?.initViewModel,
@@ -104,8 +105,8 @@ abstract class PairViewModelProviderLifecycleMixin<PVM, VM>
     Widget? child, {
     PairViewModelWidgetBuilder<PVM, VM>? builder,
   }) {
-    final _builder =
-        builder ?? (this as PairViewModelProviderBuilder<PVM, VM>?)?.buildChild;
+    final _builder = builder ??
+        (this.asSafeType<PairViewModelProviderBuilder<PVM, VM>>())?.buildChild;
 
     return ViewModelBinding<PVM, Tuple2<PVM, VM>>(
       selector: (context, pvm) => Tuple2(pvm, context.viewModel<VM>()),

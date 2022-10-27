@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'extension/object_extension.dart';
 
 import 'lifecycle_widget.dart';
 import 'view_model_provider.dart';
@@ -16,10 +17,10 @@ abstract class ViewModelProviderMixin<VM extends ChangeNotifier>
   }) {
     /// 混入 [ViewModelProviderLifecycleMixin] 不再 Provider 注册生命周期
     final _lifecycle = this is! ViewModelProviderLifecycleMixin<VM>
-        ? this as ViewModelProviderLifecycle<VM>?
+        ? this.asSafeType<ViewModelProviderLifecycle<VM>>()
         : null;
 
-    final _builder = this as ViewModelProviderBuilder<VM>?;
+    final _builder = this.asSafeType<ViewModelProviderBuilder<VM>>();
 
     return ViewModelProvider<VM>(
       create: create,
@@ -44,10 +45,10 @@ abstract class ChildViewModelProviderMixin<VM extends ChangeNotifier>
   }) {
     /// 混入 [ChildViewModelProviderLifecycleMixin] 不再 Provider 注册生命周期
     final _lifecycle = this is! ViewModelProviderLifecycleMixin<VM>
-        ? this as ViewModelProviderLifecycle<VM>?
+        ? this.asSafeType<ViewModelProviderLifecycle<VM>>()
         : null;
 
-    final _builder = this as ViewModelProviderBuilder<VM>?;
+    final _builder = this.asSafeType<ViewModelProviderBuilder<VM>>();
 
     return ChildViewModelProvider(
       create: create,
@@ -73,10 +74,10 @@ abstract class ValueViewModelProviderMixin<VM extends ChangeNotifier>
   }) {
     /// 混入 [ChildViewModelProviderLifecycleMixin] 不再 Provider 注册生命周期
     final _lifecycle = this is! ViewModelProviderLifecycleMixin<VM>
-        ? this as ViewModelProviderLifecycle<VM>?
+        ? this.asSafeType<ViewModelProviderLifecycle<VM>>()
         : null;
 
-    final _builder = this as ViewModelProviderBuilder<VM>?;
+    final _builder = this.asSafeType<ViewModelProviderBuilder<VM>>();
 
     return ValueViewModelProvider(
       create: create,
@@ -101,7 +102,7 @@ abstract class ViewModelProviderLifecycleMixin<VM>
     ViewModelWidgetBuilder<VM>? builder,
   }) {
     final _builder =
-        builder ?? (this as ViewModelProviderBuilder<VM>?)?.buildChild;
+        builder ?? this.asSafeType<ViewModelProviderBuilder<VM>>()?.buildChild;
 
     return ViewModelBinding<VM, VM>(
       selector: (context, vm) => vm,

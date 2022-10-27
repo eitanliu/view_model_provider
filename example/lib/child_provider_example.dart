@@ -203,7 +203,8 @@ class ValueViewModelProviderExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueViewModelProvider<ChildViewModel>(
-      create: (context) => context.watch<ParentViewModel>().valueViewModel,
+      /// 使用viewModel扩展函数 只监听ParentViewModel变化
+      create: (context) => context.viewModel<ParentViewModel>().valueViewModel,
       initViewModel: (context, viewModel) {
         debugPrint("ValueViewModelProvider initViewModel $viewModel");
       },
@@ -241,6 +242,7 @@ class ChildViewModelProviderExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChildViewModelProvider<ChildViewModel>(
+      /// 使用watch扩展函数 监听ParentViewModel的notifyListeners
       create: (context) => context.watch<ParentViewModel>().childViewModel,
       initViewModel: (context, viewModel) {
         debugPrint("ChildViewModelProvider initViewModel $viewModel");

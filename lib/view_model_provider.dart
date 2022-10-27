@@ -259,7 +259,9 @@ abstract class ViewModelProviderWidget<VM extends ChangeNotifier>
 
 /// 抽象 ChildViewModelProviderWidget 提供继承功能
 abstract class ChildViewModelProviderWidget<VM extends ChangeNotifier>
-    extends SingleChildStatelessWidget with ChildViewModelProviderMixin<VM> {
+    extends SingleChildStatelessWidget
+    with ChildViewModelProviderMixin<VM>
+    implements ViewModelProviderBuilder<VM> {
   ChildViewModelProviderWidget({
     Key? key,
     Widget? child,
