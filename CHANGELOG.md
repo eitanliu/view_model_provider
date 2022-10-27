@@ -1,3 +1,7 @@
+## [1.0.2]
+
+* security type check
+
 ## [1.0.1]
 
 * upgrade flutter 3.0

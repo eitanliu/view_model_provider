@@ -72,6 +72,7 @@ LifecycleWidget，提供Widget生命周期监听，开放了以下回调接口�
 
 ## ViewModelProvider
 
+### 1 嵌套使用
 创建ViewModel 提供给子Widget使用，开放了以下回调接口可进行初始化和解绑操作
 
 - initViewModel，ViewModel首次初始化 Widget initState 期间执行
@@ -103,11 +104,12 @@ class ProviderExample extends StatelessWidget {
 }
 ```
 
-另外还可以通过继承`ViewModelProviderWidget`来创建ViewModel
+### 2 通过继承来创建ViewModel
 
 ```dart
 /// 继承 [ViewModelProviderWidget] 创建ViewModel
-class ProviderWidgetExample extends ViewModelProviderWidget<ViewModel> {
+class ProviderWidgetExample extends ViewModelProviderWidget<ViewModel>
+    with ViewModelProviderLifecycle<ViewModel> {
   ProviderWidgetExample() : super();
 
   @override
@@ -124,9 +126,52 @@ class ProviderWidgetExample extends ViewModelProviderWidget<ViewModel> {
   }
 
   @override
-  Widget buildChild(BuildContext context, ViewModel viewModel, Widget child) {
+  Widget buildChild(BuildContext context, ViewModel viewModel, Widget? child) {
     debugPrint("ProviderWidgetExample build $viewModel");
     return ViewModelWidget(viewModel);
+  }
+}
+```
+
+### 3 通过Mixin来创建ViewModel
+```dart
+/// 混入 [ViewModelProviderMixin] 创建ViewModel
+/// 混入 [ViewModelProviderLifecycle] 监听ViewModel生命周期
+/// 混入 [ViewModelProviderBuilder] 支持buildChild
+class ProviderMixinExample extends SingleChildStatelessWidget
+    with
+        ViewModelProviderMixin<ViewModel>,
+        ViewModelProviderLifecycle<ViewModel>,
+        ViewModelProviderBuilder<ViewModel> {
+  ProviderMixinExample() : super();
+
+  @override
+  ViewModel create(BuildContext context) => ViewModel();
+
+  @override
+  void initViewModel(BuildContext context, ViewModel viewModel) {
+    debugPrint("ProviderMixinExample initViewModel $viewModel");
+  }
+  @override
+  void initFrame(BuildContext context, ViewModel viewModel) {
+    debugPrint("ProviderMixinExample initFrame $viewModel");
+    super.initFrame(context, viewModel);
+  }
+
+  @override
+  void bindViewModel(BuildContext context, ViewModel viewModel) {
+    debugPrint("ProviderMixinExample bindViewModel $viewModel");
+  }
+
+  @override
+  Widget buildChild(BuildContext context, ViewModel viewModel, Widget? child) {
+    debugPrint("ProviderMixinExample build $viewModel");
+    return ViewModelWidget(viewModel);
+  }
+
+  @override
+  Widget buildWithChild(BuildContext context, Widget? child) {
+    return buildProvider(context, child);
   }
 }
 ```
@@ -162,7 +207,7 @@ class ChildViewModel extends ChangeNotifier {
 ### 1 通过 ViewModelProvider 创建父ViewModel
 
 ```dart
-class ChildProviderExapmle extends StatelessWidget {
+class ChildProviderExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ViewModelProvider<ParentViewModel>(
@@ -171,6 +216,7 @@ class ChildProviderExapmle extends StatelessWidget {
         return Scaffold(
           body: Container(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ValueViewModelProviderExample(),
                 ChildViewModelProviderExample(),
@@ -194,7 +240,53 @@ class ChildProviderExapmle extends StatelessWidget {
 
 
 ### 2 创建子ViewModelProvider
-#### 2-1 ChildViewModelProvider
+
+#### 2-1 ValueViewModelProvider
+
+作用和回调与 ChildViewModelProvider一样，接收数据类型为 `ValueListenable<ChangeNotifier>`
+
+```dart
+/// [ValueViewModelProvider] 获取子 ViewModel 例子
+class ValueViewModelProviderExample extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ValueViewModelProvider<ChildViewModel>(
+      /// 使用viewModel扩展函数 只监听ParentViewModel变化
+      create: (context) => context.viewModel<ParentViewModel>().valueViewModel,
+      initViewModel: (context, viewModel) {
+        debugPrint("ValueViewModelProvider initViewModel $viewModel");
+      },
+      bindViewModel: (context, viewModel) {
+        debugPrint("ValueViewModelProvider bindViewModel $viewModel");
+      },
+      disposeViewModel: (context, viewModel) {
+        debugPrint("ValueViewModelProvider disposeViewModel $viewModel");
+      },
+      changeViewModel: (context, viewModel, oldViewModel) {
+        debugPrint(
+            "ValueViewModelProvider changeViewModel $viewModel, $oldViewModel");
+      },
+      builder: (context, viewModel, child) {
+        debugPrint("ValueViewModelProvider builder $viewModel");
+        return Row(
+          children: [
+            ElevatedButton(
+              onPressed: () => viewModel.addValue(),
+              child: Text("addValue"),
+            ),
+            ValueListenableBuilder(
+              valueListenable: viewModel.value,
+              builder: (context, value, child) => Text("${viewModel.value}"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+```
+
+#### 2-2 ChildViewModelProvider
 
 需要手动刷新通常用于列表刷新Item区域，在ViewModelProvider已有回调基础上添加了
 
@@ -205,64 +297,45 @@ class ChildProviderExapmle extends StatelessWidget {
 class ChildViewModelProviderExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChildViewModelProvider<ParentViewModel, ChildViewModel>(
-      create: (_, parent) => parent.childViewModel,
-      changeViewModel: (context, parent, viewModel, oldViewModel) {
+    return ChildViewModelProvider<ChildViewModel>(
+      /// 使用watch扩展函数 监听ParentViewModel的notifyListeners
+      create: (context) => context.watch<ParentViewModel>().childViewModel,
+      initViewModel: (context, viewModel) {
+        debugPrint("ChildViewModelProvider initViewModel $viewModel");
+      },
+      bindViewModel: (context, viewModel) {
+        debugPrint("ChildViewModelProvider bindViewModel $viewModel");
+      },
+      disposeViewModel: (context, viewModel) {
+        debugPrint("ChildViewModelProvider disposeViewModel $viewModel");
+      },
+      changeViewModel: (context, viewModel, oldViewModel) {
         debugPrint(
             "ChildViewModelProvider changeViewModel $viewModel, $oldViewModel");
       },
-      builder: (context, parent, viewModel, child) {
+      builder: (context, viewModel, child) {
         debugPrint("ChildViewModelProvider builder $viewModel");
-        return Row(
+        return Column(
           children: [
-            ValueListenableBuilder(
-              valueListenable: viewModel.value,
-              builder: (context, value, child) => Text("${viewModel.value}"),
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () => viewModel.addValue(),
+                  child: Text("addValue"),
+                ),
+                ValueListenableBuilder(
+                  valueListenable: viewModel.value,
+                  builder: (context, value, child) =>
+                      Text("${viewModel.value}"),
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: () => viewModel.addValue(),
-              child: Text("addValue"),
-            )
           ],
         );
       },
     );
   }
 }
-```
-
-#### 2-2 ValueViewModelProvider
-
-作用和回调与 ChildViewModelProvider一样，接收数据类型为 `ValueListenable<ChangeNotifier>`
-
-```dart
-/// [ValueViewModelProvider] 获取子 ViewModel 例子
-class ValueViewModelProviderExample extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ValueViewModelProvider<ParentViewModel, ChildViewModel>(
-      create: (_, parent) => parent.valueViewModel,
-      changeViewModel: (context, parent, viewModel, oldViewModel) {
-        debugPrint(
-            "ValueViewModelProvider changeViewModel $viewModel, $oldViewModel");
-      },
-      builder: (context, parent, viewModel, child) {
-        debugPrint("ValueViewModelProvider builder $viewModel");
-        return Row(
-          children: [
-            ValueListenableBuilder(
-              valueListenable: viewModel.value,
-              builder: (context, value, child) => Text("${viewModel.value}"),
-            ),
-            ElevatedButton(
-              onPressed: () => viewModel.addValue(),
-              child: Text("addValue"),
-            )
-          ],
-        );
-      },
-    );
-  }
 ```
 
 
